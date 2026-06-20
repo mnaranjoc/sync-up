@@ -1,4 +1,5 @@
-using SyncUp.Agent.Service;
+using SyncUp.Agent.Services;
+using SyncUp.Agent.Services.FileWatcherService;
 
 namespace SyncUp.Agent;
 
@@ -7,7 +8,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
-        builder.Services.AddHostedService<WatcherService>();
+        builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
+        builder.Services.AddHostedService<WatcherTask>();
 
         var host = builder.Build();
         host.Run();

@@ -1,13 +1,13 @@
 using SyncUp.Agent.Common;
 
-namespace SyncUp.Agent.Service;
+namespace SyncUp.Agent.Services.FileWatcherService;
 
-public class WatcherService : BackgroundService
+public class FileWatcherService : IFileWatcherService
 {
     private FileSystemWatcher _watcher;
-    private readonly ILogger<WatcherService> _logger;
+    private readonly ILogger<FileWatcherService> _logger;
 
-    public WatcherService(ILogger<WatcherService> logger)
+    public FileWatcherService(ILogger<FileWatcherService> logger)
     {
         _watcher = new FileSystemWatcher("")
         {
@@ -32,25 +32,15 @@ public class WatcherService : BackgroundService
         _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public void Start()
     {
-        _logger.LogInformation("{WorkerName} started.", nameof(WatcherService));
-
-        try
-        {
+        if (_watcher != null)
             _watcher.EnableRaisingEvents = true;
+    }
 
-            await Task.Delay(Timeout.Infinite, stoppingToken);
-        }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation("{WorkerName} stopped.", nameof(WatcherService));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, Constants.ERROR_UNEXPECTED);
-        }
-        finally
+    public void Stop()
+    {
+        if (_watcher != null)
         {
             _watcher.EnableRaisingEvents = false;
             _watcher.Dispose();
