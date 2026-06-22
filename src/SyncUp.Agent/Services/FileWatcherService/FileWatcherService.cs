@@ -6,6 +6,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
 {
     private FileSystemWatcher? _watcher;
     private readonly ILogger<FileWatcherService> _logger;
+    private readonly object _lock = new();
     private bool _disposed;
 
     public FileWatcherService(ILogger<FileWatcherService> logger)
@@ -13,44 +14,50 @@ public class FileWatcherService : IFileWatcherService, IDisposable
         _logger = logger;
     }
 
-    public void Start()
+    public void Start(string path)
     {
-        if (_watcher != null) return;
-
-        _watcher = new FileSystemWatcher("")
+        lock (_lock)
         {
-            Filter = Constants.FILTER_ALL_FILES,
-            IncludeSubdirectories = true,
-            InternalBufferSize = 65536,
-            NotifyFilter = NotifyFilters.DirectoryName
-                         | NotifyFilters.FileName
-                         | NotifyFilters.LastWrite
-        };
+            if (_watcher != null) return;
 
-        _watcher.Changed += OnChanged;
-        _watcher.Created += OnCreated;
-        _watcher.Deleted += OnDeleted;
-        _watcher.Renamed += OnRenamed;
-        _watcher.Error += OnError;
+            _watcher = new FileSystemWatcher(path)
+            {
+                Filter = Constants.FILTER_ALL_FILES,
+                IncludeSubdirectories = true,
+                InternalBufferSize = 65536,
+                NotifyFilter = NotifyFilters.DirectoryName
+                            | NotifyFilters.FileName
+                            | NotifyFilters.LastWrite
+            };
 
-        _watcher.EnableRaisingEvents = true;
+            _watcher.Changed += OnChanged;
+            _watcher.Created += OnCreated;
+            _watcher.Deleted += OnDeleted;
+            _watcher.Renamed += OnRenamed;
+            _watcher.Error += OnError;
+
+            _watcher.EnableRaisingEvents = true;
+        }
     }
 
     public void Stop()
     {
-        if (_watcher == null) return;
+        lock (_lock)
+        {
+            if (_watcher == null) return;
 
-        _watcher.EnableRaisingEvents = false;
+            _watcher.EnableRaisingEvents = false;
 
-        _watcher.Changed -= OnChanged;
-        _watcher.Created -= OnCreated;
-        _watcher.Deleted -= OnDeleted;
-        _watcher.Renamed -= OnRenamed;
-        _watcher.Error -= OnError;
+            _watcher.Changed -= OnChanged;
+            _watcher.Created -= OnCreated;
+            _watcher.Deleted -= OnDeleted;
+            _watcher.Renamed -= OnRenamed;
+            _watcher.Error -= OnError;
 
-        _watcher.Dispose();
+            _watcher.Dispose();
 
-        _watcher = null;
+            _watcher = null;
+        }
     }
 
     private void OnChanged(object sender, FileSystemEventArgs e)

@@ -6,11 +6,13 @@ namespace SyncUp.Agent.Services;
 public class WatcherTask : BackgroundService
 {
     private readonly IFileWatcherService _fileWatcherService;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<WatcherTask> _logger;
 
-    public WatcherTask(IFileWatcherService fileWatcherService, ILogger<WatcherTask> logger)
+    public WatcherTask(IFileWatcherService fileWatcherService, IConfiguration configuration, ILogger<WatcherTask> logger)
     {
         _fileWatcherService = fileWatcherService;
+        _configuration = configuration;
         _logger = logger;
     }
 
@@ -18,9 +20,16 @@ public class WatcherTask : BackgroundService
     {
         _logger.LogInformation("{WorkerName} started.", nameof(WatcherTask));
 
+        string? watchDirectory = _configuration["WatchDirectory"];
+        if (string.IsNullOrWhiteSpace(watchDirectory))
+        {
+            _logger.LogCritical("Configuration Error: 'PathToWatch' is missing from appsettings.json.");
+            return;
+        }
+
         try
         {
-            _fileWatcherService.Start();
+            _fileWatcherService.Start(watchDirectory);
 
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
