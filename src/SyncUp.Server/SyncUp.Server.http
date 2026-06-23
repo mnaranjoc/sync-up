@@ -1,6 +1,6 @@
 @SyncUp.Server_HostAddress = http://localhost:5148
 
-GET {{SyncUp.Server_HostAddress}}/weatherforecast/
+GET {{SyncUp.Server_HostAddress}}/sync-manager/
 Accept: application/json
 
 ###

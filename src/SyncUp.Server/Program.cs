@@ -1,3 +1,5 @@
+using SyncUp.Server.Services;
+
 namespace SyncUp.Server
 {
     public class Program
@@ -6,7 +8,7 @@ namespace SyncUp.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddScoped<IFilesService, FilesService>();
 
             builder.Services.AddControllers();
 
