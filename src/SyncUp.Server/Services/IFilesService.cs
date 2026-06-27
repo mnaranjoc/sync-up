@@ -1,7 +1,13 @@
-﻿namespace SyncUp.Server.Services
+﻿using SyncUp.Server.Models;
+
+namespace SyncUp.Server.Services
 {
     public interface IFilesService
     {
-        public List<string> GetAll();
+        public IReadOnlyList<FileEntry> GetFiles();
+
+        public FileEntry? GetFile(string path);
+
+        public void AddFile(FileEntry file);
     }
 }

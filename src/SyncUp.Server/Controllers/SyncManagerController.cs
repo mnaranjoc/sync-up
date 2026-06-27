@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using SyncUp.Server.Models;
 using SyncUp.Server.Services;
 
 namespace SyncUp.Server.Controllers
@@ -9,40 +9,45 @@ namespace SyncUp.Server.Controllers
     public class SyncManagerController : ControllerBase
     {
         private readonly IFilesService _filesService;
-        private readonly ILogger<SyncManagerController> _logger;
 
-        public SyncManagerController(IFilesService service, ILogger<SyncManagerController> logger)
+        public SyncManagerController(IFilesService service)
         {
             _filesService = service;
-            _logger = logger;
-        }
-
-        [HttpGet("")]
-        public IActionResult GetStatus()
-        {
-            return Ok(
-                new
-                {
-                    Status = "Alive",
-                    TimeStamp = DateTime.Now,
-                    Version = "1.0.0"
-                }
-            );
         }
 
         [HttpGet("files")]
-        public ActionResult<List<string>> GetFiles()
+        public ActionResult<IReadOnlyList<FileEntry>> GetFiles()
         {
-            try
+            var files = _filesService.GetFiles();
+            return Ok(files);
+        }
+
+        [HttpGet("file/{**path}")]
+        public ActionResult<FileEntry> GetFile(string path)
+        {
+            var file = _filesService.GetFile(path);
+
+            if (file is null)
+                return NotFound();
+
+            return Ok(file);
+        }
+
+        [HttpPost("file")]
+        public ActionResult<FileEntry> AddFile([FromForm] IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { error = "File is empty." });
+
+            var newFile = new FileEntry()
             {
-                var files = _filesService.GetAll();
-                return Ok(files);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving the file master list.");
-                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to retrieve files at this time.");
-            }
+                Path = file.FileName,
+                Sha256 = "XXX"
+            };
+
+            _filesService.AddFile(newFile);
+
+            return CreatedAtAction(nameof(GetFile), new { path = newFile.Path }, newFile);
         }
     }
 }
