@@ -11,6 +11,12 @@ public class Program
         builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
         builder.Services.AddHostedService<WatcherTask>();
 
+        string apiUrl = builder.Configuration["Api"] ?? throw new InvalidOperationException("The 'Api' configuration key is missing.");
+        builder.Services.AddHttpClient<IFileWatcherService, FileWatcherService>(client =>
+        {
+            client.BaseAddress = new Uri(apiUrl);
+        });
+
         var host = builder.Build();
         host.Run();
     }
