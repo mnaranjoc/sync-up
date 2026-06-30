@@ -9,10 +9,12 @@ namespace SyncUp.Server.Controllers
     public class SyncManagerController : ControllerBase
     {
         private readonly IFilesService _filesService;
+        private readonly bool _allowEmptyFiles;
 
-        public SyncManagerController(IFilesService service)
+        public SyncManagerController(IFilesService service, IConfiguration configuration)
         {
             _filesService = service;
+            _allowEmptyFiles = configuration.GetValue<bool>("AllowEmptyFiles");
         }
 
         [HttpGet("files")]
@@ -36,7 +38,7 @@ namespace SyncUp.Server.Controllers
         [HttpPost("file")]
         public ActionResult<FileEntry> AddFile([FromForm] IFormFile file)
         {
-            if (file == null || file.Length == 0)
+            if (file == null || (!_allowEmptyFiles && file.Length == 0))
                 return BadRequest(new { error = "File is empty." });
 
             var newFile = new FileEntry()
