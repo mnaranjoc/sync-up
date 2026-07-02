@@ -1,4 +1,4 @@
-﻿using SyncUp.Server.Models;
+﻿using SyncUp.Shared.Models;
 using System.Security.Cryptography;
 
 namespace SyncUp.Server.Services

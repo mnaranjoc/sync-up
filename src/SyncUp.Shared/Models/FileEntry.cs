@@ -1,4 +1,4 @@
-﻿namespace SyncUp.Server.Models
+﻿namespace SyncUp.Shared.Models
 {
     public class FileEntry
     {

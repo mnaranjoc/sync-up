@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncUp.Agent", "SyncUp.Agen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncUp.Server", "SyncUp.Server\SyncUp.Server.csproj", "{5853279E-27BD-4903-9126-3671BEDAA64B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncUp.Shared", "SyncUp.Shared\SyncUp.Shared.csproj", "{0F8AFC7A-8566-485B-85DA-7792D5B09279}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5853279E-27BD-4903-9126-3671BEDAA64B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5853279E-27BD-4903-9126-3671BEDAA64B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5853279E-27BD-4903-9126-3671BEDAA64B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F8AFC7A-8566-485B-85DA-7792D5B09279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F8AFC7A-8566-485B-85DA-7792D5B09279}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F8AFC7A-8566-485B-85DA-7792D5B09279}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F8AFC7A-8566-485B-85DA-7792D5B09279}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

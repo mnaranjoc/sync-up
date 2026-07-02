@@ -1,4 +1,4 @@
-﻿using SyncUp.Server.Models;
+﻿using SyncUp.Shared.Models;
 
 namespace SyncUp.Server.Services
 {

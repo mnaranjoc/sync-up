@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SyncUp.Server.Models;
 using SyncUp.Server.Services;
+using SyncUp.Shared.Models;
 
 namespace SyncUp.Server.Controllers
 {
