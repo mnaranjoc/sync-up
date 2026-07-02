@@ -8,6 +8,6 @@ namespace SyncUp.Server.Services
 
         public FileEntry? GetFile(string path);
 
-        public void AddFile(FileEntry file);
+        public FileEntry? AddFile(IFormFile file);
     }
 }

@@ -41,15 +41,9 @@ namespace SyncUp.Server.Controllers
             if (file == null || (!_allowEmptyFiles && file.Length == 0))
                 return BadRequest(new { error = "File is empty." });
 
-            var newFile = new FileEntry()
-            {
-                Path = file.FileName,
-                Sha256 = "XXX"
-            };
+            var newFile = _filesService.AddFile(file);
 
-            _filesService.AddFile(newFile);
-
-            return CreatedAtAction(nameof(GetFile), new { path = newFile.Path }, newFile);
+            return CreatedAtAction(nameof(GetFile), new { path = newFile?.Path }, newFile);
         }
     }
 }
