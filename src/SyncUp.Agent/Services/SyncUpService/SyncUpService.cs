@@ -13,6 +13,11 @@ namespace SyncUp.Agent.Services.SyncUpService
             _logger = logger;
         }
 
+        public async Task<List<FileEntry>> GetAgentFilesList()
+        {
+            return new List<FileEntry>();
+        }
+
         public async Task<List<FileEntry>> GetServerFilesList()
         {
             var response = await _httpClient.GetAsync("sync-manager/files");

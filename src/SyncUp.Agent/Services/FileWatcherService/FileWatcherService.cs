@@ -22,6 +22,20 @@ public class FileWatcherService : IFileWatcherService, IDisposable
         {
             if (_watcher != null) return;
 
+            if (string.IsNullOrEmpty(path)) throw new Exception("Path was not provided");
+
+            if (!Directory.Exists(path))
+            {
+                if (path.StartsWith("~/"))
+                {
+                    var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    path = Path.Combine(home, path.Substring(2));
+                }
+                
+                if (!Directory.Exists(path))
+                    throw new Exception("Directory does not exist");
+            }
+
             _watcher = new FileSystemWatcher(path)
             {
                 Filter = Constants.FILTER_ALL_FILES,
