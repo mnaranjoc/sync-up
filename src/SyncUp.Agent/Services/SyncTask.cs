@@ -1,6 +1,4 @@
 ﻿using SyncUp.Agent.Services.SyncUpService;
-using SyncUp.Shared.Models;
-using System.Text.Json;
 
 namespace SyncUp.Agent.Services
 {

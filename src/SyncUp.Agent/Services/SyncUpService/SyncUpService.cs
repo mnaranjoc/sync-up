@@ -1,4 +1,6 @@
-﻿using SyncUp.Shared.Models;
+﻿using System.Net.Http.Json;
+using SyncUp.Agent.Common;
+using SyncUp.Shared.Models;
 
 namespace SyncUp.Agent.Services.SyncUpService
 {
@@ -13,17 +15,31 @@ namespace SyncUp.Agent.Services.SyncUpService
             _logger = logger;
         }
 
-        public async Task<List<FileEntry>> GetAgentFilesList()
+        public async Task<List<FileEntry>?> GetAgentFilesList()
         {
-            return new List<FileEntry>();
+            return null;
         }
 
-        public async Task<List<FileEntry>> GetServerFilesList()
+        public async Task<List<FileEntry>?> GetServerFilesList()
         {
-            var response = await _httpClient.GetAsync("sync-manager/files");
-            _logger.LogInformation(await response.Content.ReadAsStringAsync());
+            try
+            {
+                var response = await _httpClient.GetAsync("sync-manager/files");
+                
+                var files = await response.Content.ReadFromJsonAsync<List<FileEntry>>();
 
-            return new List<FileEntry>();
+                return files;
+            }
+            catch (HttpRequestException)
+            {
+                _logger.LogError(Constants.ERROR_SERVER_LIST);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, Constants.ERROR_UNEXPECTED);
+            }
+
+            return null;
         }
     }
 }
