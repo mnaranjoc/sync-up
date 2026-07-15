@@ -11,6 +11,4 @@ public interface IAgentFilesService
     public Task RemoveFile(string path);
 
     public Task RenameFile(string oldPath, string newPath);
-
-    public Task UpdateFile(string path);
 }

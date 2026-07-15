@@ -46,7 +46,6 @@ public class FileWatcherService : IFileWatcherService, IDisposable
                              | NotifyFilters.FileName
             };
 
-            _watcher.Changed += OnChanged;
             _watcher.Created += OnCreated;
             _watcher.Deleted += OnDeleted;
             _watcher.Renamed += OnRenamed;
@@ -64,7 +63,6 @@ public class FileWatcherService : IFileWatcherService, IDisposable
 
             _watcher.EnableRaisingEvents = false;
 
-            _watcher.Changed -= OnChanged;
             _watcher.Created -= OnCreated;
             _watcher.Deleted -= OnDeleted;
             _watcher.Renamed -= OnRenamed;
@@ -75,9 +73,6 @@ public class FileWatcherService : IFileWatcherService, IDisposable
             _watcher = null;
         }
     }
-
-    private async void OnChanged(object sender, FileSystemEventArgs e)
-        => await _agentFilesService.UpdateFile(e.FullPath);
 
     private async void OnCreated(object sender, FileSystemEventArgs e)
         => await _agentFilesService.AddFile(e.FullPath);

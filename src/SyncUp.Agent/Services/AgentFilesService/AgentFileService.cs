@@ -119,16 +119,4 @@ public class AgentFileService : IAgentFilesService
 
         return Task.CompletedTask;
     }
-
-    public Task UpdateFile(string path)
-    {
-        var fileToUpdate = GetFile(path);
-
-        if (fileToUpdate != null)
-        {
-            fileToUpdate.Sha256 = "newSha";
-        }
-
-        return Task.CompletedTask;
-    }
 }
