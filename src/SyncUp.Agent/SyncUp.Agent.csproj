@@ -16,4 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\SyncUp.Shared\SyncUp.Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services/AgentFilesService/" />
+  </ItemGroup>
 </Project>

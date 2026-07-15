@@ -1,24 +1,25 @@
 ﻿using System.Net.Http.Json;
 using SyncUp.Agent.Common;
+using SyncUp.Agent.Services.AgentFilesService;
 using SyncUp.Shared.Models;
 
 namespace SyncUp.Agent.Services.SyncUpService
 {
     public class SyncUpService : ISyncUpService
     {
+        private readonly IAgentFilesService _agentFilesService;
         private readonly HttpClient _httpClient;
         private readonly ILogger<SyncUpService> _logger;
 
-        public SyncUpService(HttpClient httpClient, ILogger<SyncUpService> logger)
+        public SyncUpService(IAgentFilesService agentFilesService, HttpClient httpClient, ILogger<SyncUpService> logger)
         {
+            _agentFilesService = agentFilesService;
             _httpClient = httpClient;
             _logger = logger;
         }
 
-        public async Task<List<FileEntry>?> GetAgentFilesList()
-        {
-            return null;
-        }
+        public async Task<IReadOnlyList<FileEntry>?> GetAgentFilesList()
+            => _agentFilesService.GetFiles();
 
         public async Task<List<FileEntry>?> GetServerFilesList()
         {
