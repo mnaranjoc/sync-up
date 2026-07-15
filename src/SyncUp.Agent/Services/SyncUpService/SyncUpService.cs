@@ -10,6 +10,7 @@ namespace SyncUp.Agent.Services.SyncUpService
         private readonly IAgentFilesService _agentFilesService;
         private readonly HttpClient _httpClient;
         private readonly ILogger<SyncUpService> _logger;
+        private bool firstTime = true;
 
         public SyncUpService(IAgentFilesService agentFilesService, HttpClient httpClient, ILogger<SyncUpService> logger)
         {
@@ -19,7 +20,15 @@ namespace SyncUp.Agent.Services.SyncUpService
         }
 
         public async Task<IReadOnlyList<FileEntry>?> GetAgentFilesList()
-            => _agentFilesService.GetFiles();
+        {
+            if (firstTime)
+            {
+                await _agentFilesService.ReadFromLocalFolder();
+                firstTime = false;
+            }
+
+            return _agentFilesService.GetFiles();
+        }
 
         public async Task<List<FileEntry>?> GetServerFilesList()
         {

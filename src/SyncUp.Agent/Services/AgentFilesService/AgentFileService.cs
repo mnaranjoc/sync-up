@@ -5,17 +5,53 @@ namespace SyncUp.Agent.Services.AgentFilesService;
 public class AgentFileService : IAgentFilesService
 {
     private HttpClient _httpClient;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<AgentFileService> _logger;
     private readonly List<FileEntry> _files = [];
 
-    public AgentFileService(HttpClient httpClient, ILogger<AgentFileService> logger)
+    public AgentFileService(HttpClient httpClient, IConfiguration configuration, ILogger<AgentFileService> logger)
     {
         _httpClient = httpClient;
+        _configuration = configuration;
         _logger = logger;
     }
 
     public IReadOnlyList<FileEntry> GetFiles()
         => _files;
+
+    public Task ReadFromLocalFolder()
+    {
+        string path = $"{_configuration["WatchDirectory"]}";
+
+        if (string.IsNullOrEmpty(path)) throw new Exception("Path was not provided");
+
+        if (!Directory.Exists(path))
+            {
+                if (path.StartsWith("~/"))
+                {
+                    var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    path = Path.Combine(home, path.Substring(2));
+                }
+                
+                if (!Directory.Exists(path))
+                    throw new Exception("Directory does not exist");
+            }
+
+        var files = Directory.GetFiles(path).Where(f => Path.GetFileName(f) != ".DS_Store");
+
+        foreach (var file in files)
+        {
+            _files.Add(
+                new FileEntry()
+                {
+                    Path = file,
+                    Sha256 = "SHA256"
+                }
+            );
+        }
+
+        return Task.CompletedTask;
+    }
 
     private FileEntry? GetFile(string path)
         => _files.FirstOrDefault(x => x.Path == path);
