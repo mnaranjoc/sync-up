@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace SyncUp.Server.Services
 {
-    public class FilesService : IFilesService
+    public class ServerFilesService : IServerFilesService
     {
         private readonly List<FileEntry> files = [];
 

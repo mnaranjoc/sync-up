@@ -2,7 +2,7 @@
 
 namespace SyncUp.Server.Services
 {
-    public interface IFilesService
+    public interface IServerFilesService
     {
         public IReadOnlyList<FileEntry> GetFiles();
 

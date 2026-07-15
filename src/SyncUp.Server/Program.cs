@@ -8,7 +8,7 @@ namespace SyncUp.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddSingleton<IFilesService, FilesService>();
+            builder.Services.AddSingleton<IServerFilesService, ServerFilesService>();
 
             builder.Services.AddControllers();
 
