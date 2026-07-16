@@ -1,5 +1,5 @@
-using SyncUp.Agent.Common;
 using SyncUp.Agent.Services.AgentFilesService;
+using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Services.FileWatcherService;
 
@@ -23,7 +23,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
         {
             if (_watcher != null) return;
 
-            if (string.IsNullOrEmpty(path)) throw new Exception("Path was not provided");
+            if (string.IsNullOrEmpty(path)) throw new Exception(Constants.PATH_NOT_PROVIDED);
 
             if (!Directory.Exists(path))
             {
@@ -34,7 +34,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
                 }
                 
                 if (!Directory.Exists(path))
-                    throw new Exception("Directory does not exist");
+                    throw new Exception(Constants.FOLDER_DOESNT_EXIST);
             }
 
             _watcher = new FileSystemWatcher(path)
@@ -88,7 +88,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
         var ex = e.GetException();
         if (ex != null)
         {
-            _logger.LogError(ex, "Error en FileSystemWatcher: {Message}", ex.Message);
+            _logger.LogError(ex, ex.Message);
         }
     }
 

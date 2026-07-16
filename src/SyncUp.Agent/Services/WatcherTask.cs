@@ -1,5 +1,5 @@
-using SyncUp.Agent.Common;
 using SyncUp.Agent.Services.FileWatcherService;
+using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Services;
 

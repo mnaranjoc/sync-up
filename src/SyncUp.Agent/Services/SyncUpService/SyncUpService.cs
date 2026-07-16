@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Json;
-using SyncUp.Agent.Common;
 using SyncUp.Agent.Services.AgentFilesService;
 using SyncUp.Shared.Models;
+using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Services.SyncUpService
 {

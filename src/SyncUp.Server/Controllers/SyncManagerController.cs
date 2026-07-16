@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SyncUp.Server.Services;
 using SyncUp.Shared.Models;
+using SyncUp.Shared.Util;
 
 namespace SyncUp.Server.Controllers
 {
@@ -14,7 +15,7 @@ namespace SyncUp.Server.Controllers
         public SyncManagerController(IServerFilesService serverFilesService, IConfiguration configuration)
         {
             _serverFilesService = serverFilesService;
-            _allowEmptyFiles = configuration.GetValue<bool>("AllowEmptyFiles");
+            _allowEmptyFiles = configuration.GetValue<bool>(Constants.CONFIG_ALLOW_EMPTY_FILES);
         }
 
         [HttpGet("files")]
@@ -39,7 +40,7 @@ namespace SyncUp.Server.Controllers
         public ActionResult<FileEntry> AddFile([FromForm] IFormFile file)
         {
             if (file == null || (!_allowEmptyFiles && file.Length == 0))
-                return BadRequest(new { error = "File is empty." });
+                return BadRequest(new { error = Constants.ERROR_EMPTY_FILE });
 
             var newFile = _serverFilesService.AddFile(file);
 

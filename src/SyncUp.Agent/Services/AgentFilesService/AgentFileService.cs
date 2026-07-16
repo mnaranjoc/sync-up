@@ -1,4 +1,5 @@
 using SyncUp.Shared.Models;
+using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Services.AgentFilesService;
 
@@ -21,9 +22,9 @@ public class AgentFileService : IAgentFilesService
 
     public Task ReadFromLocalFolder()
     {
-        string path = $"{_configuration["WatchDirectory"]}";
+        string path = $"{_configuration[Constants.CONFIG_WATCH_DIRECTORY]}";
 
-        if (string.IsNullOrEmpty(path)) throw new Exception("Path was not provided");
+        if (string.IsNullOrEmpty(path)) throw new Exception(Constants.PATH_NOT_PROVIDED);
 
         if (!Directory.Exists(path))
             {
@@ -34,7 +35,7 @@ public class AgentFileService : IAgentFilesService
                 }
                 
                 if (!Directory.Exists(path))
-                    throw new Exception("Directory does not exist");
+                    throw new Exception(Constants.FOLDER_DOESNT_EXIST);
             }
 
         var files = Directory.GetFiles(path).Where(f => Path.GetFileName(f) != ".DS_Store");
@@ -72,7 +73,7 @@ public class AgentFileService : IAgentFilesService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Critical failure in OnCreated event handler for file: {FilePath}", path);
+            _logger.LogError(ex, path);
         }
     }
 
