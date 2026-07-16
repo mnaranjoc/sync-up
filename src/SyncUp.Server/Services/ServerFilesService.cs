@@ -1,5 +1,5 @@
 ﻿using SyncUp.Shared.Models;
-using System.Security.Cryptography;
+using SyncUp.Shared.Util;
 
 namespace SyncUp.Server.Services
 {
@@ -23,18 +23,16 @@ namespace SyncUp.Server.Services
             if (file == null)
                 throw new ArgumentNullException(nameof(file));
 
-            using var stream = file.OpenReadStream();
-            var hashBytes = SHA256.HashData(stream);
-            var sha256 = Convert.ToHexString(hashBytes);
+            var fileAlreadyExists = GetFile(file.FileName);
+            if (fileAlreadyExists != null)
+                return fileAlreadyExists;
 
+            using var stream = file.OpenReadStream();
             var newFile = new FileEntry()
             {
                 Path = file.FileName,
-                Sha256 = sha256
+                Sha256 = Files.GetSHA256FromStream(stream)
             };
-
-            if (GetFile(newFile.Path) != null)
-                return null;
 
             files.Add(newFile);
 

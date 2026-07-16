@@ -17,7 +17,7 @@ public class Program
         builder.Services.AddHostedService<SyncTask>();
 
         string apiUrl = builder.Configuration["Api"] ?? throw new InvalidOperationException("The 'Api' configuration key is missing.");
-        //builder.Services.AddHttpClient<IFileWatcherService, FileWatcherService>(client => { client.BaseAddress = new Uri(apiUrl); });
+        builder.Services.AddHttpClient<IAgentFilesService, AgentFileService>(client => { client.BaseAddress = new Uri(apiUrl); });
         builder.Services.AddHttpClient<ISyncUpService, SyncUpService>(client => { client.BaseAddress = new Uri(apiUrl); });
 
         var host = builder.Build();

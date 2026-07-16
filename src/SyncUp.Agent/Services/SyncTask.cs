@@ -1,4 +1,5 @@
 ﻿using SyncUp.Agent.Services.SyncUpService;
+using SyncUp.Shared.Models;
 
 namespace SyncUp.Agent.Services
 {
@@ -26,6 +27,8 @@ namespace SyncUp.Agent.Services
                     _logger.LogInformation("Server has {Count} files.", serverFiles.Count);
                 }
 
+                await Task.Delay(5000, stoppingToken);
+
                 // Get agent files
                 var agentFiles = await _service.GetAgentFilesList();
                 if (agentFiles != null)
@@ -33,11 +36,14 @@ namespace SyncUp.Agent.Services
                     _logger.LogInformation("Agent has {Count} files.", agentFiles.Count);
                 }
 
-                // Generate download list
-
-                // Generate upload list
-
-                await Task.Delay(5000, stoppingToken);
+                // Get missing items in one or another list
+                if (serverFiles != null && agentFiles != null)
+                {
+                    List<FileEntry> missingFiles = serverFiles
+                        .Concat(agentFiles)
+                        .DistinctBy(f => f.Path)
+                        .ToList();
+                }
             }
         }
     }

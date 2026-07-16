@@ -23,7 +23,7 @@ namespace SyncUp.Agent.Services.SyncUpService
         {
             if (firstTime)
             {
-                await _agentFilesService.ReadFromLocalFolder();
+                await _agentFilesService.LoadFolderFilesOnStartup();
                 firstTime = false;
             }
 

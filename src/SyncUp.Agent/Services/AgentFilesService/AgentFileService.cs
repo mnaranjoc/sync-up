@@ -20,38 +20,17 @@ public class AgentFileService : IAgentFilesService
     public IReadOnlyList<FileEntry> GetFiles()
         => _files;
 
-    public Task ReadFromLocalFolder()
+    public async Task LoadFolderFilesOnStartup()
     {
-        string path = $"{_configuration[Constants.CONFIG_WATCH_DIRECTORY]}";
+        string dir = $"{_configuration[Constants.CONFIG_WATCH_DIRECTORY]}";
+        var files = Files.GetFilesFromDirectory(dir);
 
-        if (string.IsNullOrEmpty(path)) throw new Exception(Constants.PATH_NOT_PROVIDED);
-
-        if (!Directory.Exists(path))
-            {
-                if (path.StartsWith("~/"))
-                {
-                    var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                    path = Path.Combine(home, path.Substring(2));
-                }
-                
-                if (!Directory.Exists(path))
-                    throw new Exception(Constants.FOLDER_DOESNT_EXIST);
-            }
-
-        var files = Directory.GetFiles(path).Where(f => Path.GetFileName(f) != ".DS_Store");
-
-        foreach (var file in files)
+        foreach (var path in files)
         {
-            _files.Add(
-                new FileEntry()
-                {
-                    Path = file,
-                    Sha256 = "SHA256"
-                }
-            );
+            await AddFile(path);
         }
 
-        return Task.CompletedTask;
+        return;
     }
 
     private FileEntry? GetFile(string path)
@@ -61,13 +40,9 @@ public class AgentFileService : IAgentFilesService
     {
         try
         {
-            //await ProcessAndUploadFileAsync(path);
+            await ProcessAndUploadFileAsync(path);
 
-            var newFile = new FileEntry()
-            {
-                Path = path,
-                Sha256 = "sha256"
-            };
+            var newFile = Files.FileEntryFromPath(path);
 
             _files.Add(newFile);
         }
@@ -77,63 +52,59 @@ public class AgentFileService : IAgentFilesService
         }
     }
 
-    // private async Task ProcessAndUploadFileAsync(string filePath)
-    // {
-    //     FileStream? fileStream = await WaitForFileAccessAsync(filePath, maxRetries: 5, delayMs: 500);
+    private async Task ProcessAndUploadFileAsync(string filePath)
+    {
+        FileStream? fileStream = await WaitForFileAccessAsync(filePath, maxRetries: 5, delayMs: 500);
 
-    //     if (fileStream == null)
-    //     {
-    //         _logger.LogError("File is locked and could not be accessed after multiple attempts: {FilePath}", filePath);
-    //         return;
-    //     }
+        if (fileStream == null)
+        {
+            _logger.LogError("File is locked and could not be accessed after multiple attempts: {FilePath}", filePath);
+            return;
+        }
 
-    //     try
-    //     {
-    //         using (fileStream)
-    //         using (var streamContent = new StreamContent(fileStream))
-    //         using (var content = new MultipartFormDataContent())
-    //         {
-    //             string fileName = Path.GetFileName(filePath);
-    //             content.Add(streamContent, "file", fileName);
+        try
+        {
+            using (fileStream)
+            using (var streamContent = new StreamContent(fileStream))
+            using (var content = new MultipartFormDataContent())
+            {
+                string fileName = Path.GetFileName(filePath);
+                content.Add(streamContent, "file", fileName);
 
-    //             var response = await _httpClient.PostAsync("sync-manager/file", content);
+                var response = await _httpClient.PostAsync("sync-manager/file", content);
 
-    //             if (response.IsSuccessStatusCode)
-    //             {
-    //                 _logger.LogInformation("Successfully uploaded {FileName}", fileName);
-    //             }
-    //             else
-    //             {
-    //                 _logger.LogError("Failed to upload {FileName}. Status code: {StatusCode}", fileName, response.StatusCode);
-    //             }
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Error processing and uploading file: {FilePath}", filePath);
-    //     }
-    // }
+                if (response.IsSuccessStatusCode)
+                    _logger.LogInformation("Successfully uploaded {FileName}", fileName);
+                else
+                    _logger.LogError("Failed to upload {FileName}. Status code: {StatusCode}", fileName, response.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing and uploading file: {FilePath}", filePath);
+        }
+    }
 
-    // private async Task<FileStream?> WaitForFileAccessAsync(string filePath, int maxRetries, int delayMs)
-    // {
-    //     for (int i = 0; i < maxRetries; i++)
-    //     {
-    //         try
-    //         {
-    //             // Open the file with Read access and allow other processes to Read/Write
-    //             return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-    //         }
-    //         catch (IOException)
-    //         {
-    //             if (i == maxRetries - 1)
-    //             {
-    //                 break;
-    //             }
-    //             await Task.Delay(delayMs);
-    //         }
-    //     }
-    //     return null;
-    // }
+    private async Task<FileStream?> WaitForFileAccessAsync(string filePath, int maxRetries, int delayMs)
+    {
+        for (int i = 0; i < maxRetries; i++)
+        {
+            try
+            {
+                // Open the file with Read access and allow other processes to Read/Write
+                return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            }
+            catch (IOException)
+            {
+                if (i == maxRetries - 1)
+                {
+                    break;
+                }
+                await Task.Delay(delayMs);
+            }
+        }
+        return null;
+    }
 
     public async Task RemoveFile(string path)
     {

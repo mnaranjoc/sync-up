@@ -6,7 +6,7 @@ public interface IAgentFilesService
 {
     public IReadOnlyList<FileEntry> GetFiles();
 
-    public Task ReadFromLocalFolder();
+    public Task LoadFolderFilesOnStartup();
 
     public Task AddFile(string path);
 
