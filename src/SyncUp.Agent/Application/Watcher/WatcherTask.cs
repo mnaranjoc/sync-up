@@ -1,7 +1,7 @@
-using SyncUp.Agent.Services.FileWatcherService;
+using SyncUp.Agent.Application.Watcher.Services.FileWatcherService;
 using SyncUp.Shared.Util;
 
-namespace SyncUp.Agent.Services;
+namespace SyncUp.Agent.Application.SyncUp;
 
 public class WatcherTask : BackgroundService
 {

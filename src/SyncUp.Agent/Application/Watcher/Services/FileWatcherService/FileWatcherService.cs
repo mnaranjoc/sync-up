@@ -1,7 +1,7 @@
-using SyncUp.Agent.Services.AgentFilesService;
+using SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
 using SyncUp.Shared.Util;
 
-namespace SyncUp.Agent.Services.FileWatcherService;
+namespace SyncUp.Agent.Application.Watcher.Services.FileWatcherService;
 
 public class FileWatcherService : IFileWatcherService, IDisposable
 {

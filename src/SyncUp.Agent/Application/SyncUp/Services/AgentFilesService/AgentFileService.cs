@@ -1,7 +1,7 @@
 using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
 
-namespace SyncUp.Agent.Services.AgentFilesService;
+namespace SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
 
 public class AgentFileService : IAgentFilesService
 {

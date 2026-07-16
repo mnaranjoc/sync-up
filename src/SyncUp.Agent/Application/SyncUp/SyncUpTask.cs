@@ -1,14 +1,14 @@
-﻿using SyncUp.Agent.Services.SyncUpService;
+﻿using SyncUp.Agent.Application.SyncUp.Services.SyncUpService;
 using SyncUp.Shared.Models;
 
-namespace SyncUp.Agent.Services
+namespace SyncUp.Agent.Application.SyncUp
 {
-    public class SyncTask : BackgroundService
+    public class SyncUpTask : BackgroundService
     {
         private readonly ISyncUpService _service;
-        private readonly ILogger<SyncTask> _logger;
+        private readonly ILogger<SyncUpTask> _logger;
 
-        public SyncTask(ISyncUpService service, ILogger<SyncTask> logger)
+        public SyncUpTask(ISyncUpService service, ILogger<SyncUpTask> logger)
         {
             _service = service;
             _logger = logger;

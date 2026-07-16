@@ -1,4 +1,4 @@
-namespace SyncUp.Agent.Services.FileWatcherService;
+namespace SyncUp.Agent.Application.Watcher.Services.FileWatcherService;
 
 public interface IFileWatcherService
 {

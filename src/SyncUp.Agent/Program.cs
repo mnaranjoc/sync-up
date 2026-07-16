@@ -1,7 +1,7 @@
-using SyncUp.Agent.Services;
-using SyncUp.Agent.Services.FileWatcherService;
-using SyncUp.Agent.Services.AgentFilesService;
-using SyncUp.Agent.Services.SyncUpService;
+using SyncUp.Agent.Application.SyncUp;
+using SyncUp.Agent.Application.Watcher.Services.FileWatcherService;
+using SyncUp.Agent.Application.SyncUp.Services.SyncUpService;
+using SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
 
 namespace SyncUp.Agent;
 
@@ -14,7 +14,7 @@ public class Program
         builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
         builder.Services.AddTransient<ISyncUpService, SyncUpService>();
         builder.Services.AddHostedService<WatcherTask>();
-        builder.Services.AddHostedService<SyncTask>();
+        builder.Services.AddHostedService<SyncUpTask>();
 
         string apiUrl = builder.Configuration["Api"] ?? throw new InvalidOperationException("The 'Api' configuration key is missing.");
         builder.Services.AddHttpClient<IAgentFilesService, AgentFileService>(client => { client.BaseAddress = new Uri(apiUrl); });
