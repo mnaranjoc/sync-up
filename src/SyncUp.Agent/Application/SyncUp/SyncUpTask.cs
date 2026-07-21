@@ -1,4 +1,4 @@
-﻿using SyncUp.Agent.Application.SyncUp.Services.SyncUpService;
+﻿using SyncUp.Agent.Application.SyncUp.Services;
 using SyncUp.Shared.Models;
 
 namespace SyncUp.Agent.Application.SyncUp

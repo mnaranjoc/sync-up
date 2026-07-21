@@ -1,19 +1,18 @@
-﻿using System.Net.Http.Json;
-using SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
+﻿using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Agent.Infrastructure.Api;
 using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
 
-namespace SyncUp.Agent.Application.SyncUp.Services.SyncUpService;
+namespace SyncUp.Agent.Application.SyncUp.Services;
 
 public class SyncUpService : ISyncUpService
 {
-    private readonly IAgentFilesService _agentFilesService;
+    private readonly IFileService _agentFilesService;
     private readonly ISyncUpApiClient _apiClient;
     private readonly ILogger<SyncUpService> _logger;
     private bool firstTime = true;
 
-    public SyncUpService(IAgentFilesService agentFilesService, ISyncUpApiClient apiClient, ILogger<SyncUpService> logger)
+    public SyncUpService(IFileService agentFilesService, ISyncUpApiClient apiClient, ILogger<SyncUpService> logger)
     {
         _agentFilesService = agentFilesService;
         _apiClient = apiClient;

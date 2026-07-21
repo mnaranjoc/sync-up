@@ -1,17 +1,17 @@
-using SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
+using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Shared.Util;
 
-namespace SyncUp.Agent.Application.Watcher.Services.FileWatcherService;
+namespace SyncUp.Agent.Application.Watcher.Services;
 
 public class FileWatcherService : IFileWatcherService, IDisposable
 {
     private FileSystemWatcher? _watcher;
-    private readonly IAgentFilesService _agentFilesService;
+    private readonly IFileService _agentFilesService;
     private readonly ILogger<FileWatcherService> _logger;
     private readonly object _lock = new();
     private bool _disposed;
 
-    public FileWatcherService(IAgentFilesService agentFilesService, ILogger<FileWatcherService> logger)
+    public FileWatcherService(IFileService agentFilesService, ILogger<FileWatcherService> logger)
     {
         _agentFilesService = agentFilesService;
         _logger = logger;

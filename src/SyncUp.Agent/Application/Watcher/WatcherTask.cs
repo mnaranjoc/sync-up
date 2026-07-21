@@ -1,4 +1,4 @@
-using SyncUp.Agent.Application.Watcher.Services.FileWatcherService;
+using SyncUp.Agent.Application.Watcher.Services;
 using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Application.SyncUp;

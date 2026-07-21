@@ -1,7 +1,7 @@
+using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Agent.Application.SyncUp;
-using SyncUp.Agent.Application.Watcher.Services.FileWatcherService;
-using SyncUp.Agent.Application.SyncUp.Services.SyncUpService;
-using SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
+using SyncUp.Agent.Application.SyncUp.Services;
+using SyncUp.Agent.Application.Watcher.Services;
 using SyncUp.Agent.Infrastructure.Api;
 
 namespace SyncUp.Agent;
@@ -11,7 +11,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
-        builder.Services.AddSingleton<IAgentFilesService, AgentFileService>();
+        builder.Services.AddSingleton<IFileService, FileService>();
         builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
         builder.Services.AddTransient<ISyncUpService, SyncUpService>();
         builder.Services.AddTransient<ISyncUpApiClient, SyncUpApiClient>();

@@ -1,6 +1,6 @@
 ﻿using SyncUp.Shared.Models;
 
-namespace SyncUp.Agent.Application.SyncUp.Services.SyncUpService;
+namespace SyncUp.Agent.Application.SyncUp.Services;
 
 public interface ISyncUpService
 {
