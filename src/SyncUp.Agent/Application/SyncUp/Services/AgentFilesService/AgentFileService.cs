@@ -1,3 +1,4 @@
+using SyncUp.Agent.Infrastructure.Api;
 using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
 
@@ -5,14 +6,14 @@ namespace SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
 
 public class AgentFileService : IAgentFilesService
 {
-    private HttpClient _httpClient;
+    private readonly ISyncUpApiClient _apiClient;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AgentFileService> _logger;
     private readonly List<FileEntry> _files = [];
 
-    public AgentFileService(HttpClient httpClient, IConfiguration configuration, ILogger<AgentFileService> logger)
+    public AgentFileService(ISyncUpApiClient apiClient, IConfiguration configuration, ILogger<AgentFileService> logger)
     {
-        _httpClient = httpClient;
+        _apiClient = apiClient;
         _configuration = configuration;
         _logger = logger;
     }
@@ -62,26 +63,25 @@ public class AgentFileService : IAgentFilesService
             return;
         }
 
-        try
+        using (fileStream)
+        using (var streamContent = new StreamContent(fileStream))
+        using (var content = new MultipartFormDataContent())
         {
-            using (fileStream)
-            using (var streamContent = new StreamContent(fileStream))
-            using (var content = new MultipartFormDataContent())
+            try
             {
                 string fileName = Path.GetFileName(filePath);
                 content.Add(streamContent, "file", fileName);
 
-                var response = await _httpClient.PostAsync("sync-manager/file", content);
-
-                if (response.IsSuccessStatusCode)
-                    _logger.LogInformation("Successfully uploaded {FileName}", fileName);
-                else
-                    _logger.LogError("Failed to upload {FileName}. Status code: {StatusCode}", fileName, response.StatusCode);
+                await _apiClient.AddFileAsync(content);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error processing and uploading file: {FilePath}", filePath);
+            catch (HttpRequestException)
+            {
+                _logger.LogError(Constants.ERROR_SERVER_UPLOAD);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, Constants.ERROR_UNEXPECTED);
+            }
         }
     }
 

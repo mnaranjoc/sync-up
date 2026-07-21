@@ -8,6 +8,7 @@ public static class Constants
     public const string ERROR_EMPTY_FILE = "File is empty.";
     public const string ERROR_UNEXPECTED = "An unexpected error occurred.";
     public const string ERROR_SERVER_LIST = "An error ocurred while retrieving the server file list.";
+    public const string ERROR_SERVER_UPLOAD = "An error ocurred while uploading the file.";
     public const string PATH_NOT_PROVIDED = "Path was not provided.";
     public const string FOLDER_DOESNT_EXIST = "Folder doesnt exist.";
     

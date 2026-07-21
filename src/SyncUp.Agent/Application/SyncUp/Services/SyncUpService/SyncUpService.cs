@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using SyncUp.Agent.Application.SyncUp.Services.AgentFilesService;
+using SyncUp.Agent.Infrastructure.Api;
 using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
 
@@ -8,14 +9,14 @@ namespace SyncUp.Agent.Application.SyncUp.Services.SyncUpService;
 public class SyncUpService : ISyncUpService
 {
     private readonly IAgentFilesService _agentFilesService;
-    private readonly HttpClient _httpClient;
+    private readonly ISyncUpApiClient _apiClient;
     private readonly ILogger<SyncUpService> _logger;
     private bool firstTime = true;
 
-    public SyncUpService(IAgentFilesService agentFilesService, HttpClient httpClient, ILogger<SyncUpService> logger)
+    public SyncUpService(IAgentFilesService agentFilesService, ISyncUpApiClient apiClient, ILogger<SyncUpService> logger)
     {
         _agentFilesService = agentFilesService;
-        _httpClient = httpClient;
+        _apiClient = apiClient;
         _logger = logger;
     }
 
@@ -34,11 +35,7 @@ public class SyncUpService : ISyncUpService
     {
         try
         {
-            var response = await _httpClient.GetAsync("sync-manager/files");
-            
-            var files = await response.Content.ReadFromJsonAsync<List<FileEntry>>();
-
-            return files;
+            return await _apiClient.GetFilesAsync();
         }
         catch (HttpRequestException)
         {
