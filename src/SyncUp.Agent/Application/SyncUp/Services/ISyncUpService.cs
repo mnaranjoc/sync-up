@@ -4,7 +4,9 @@ namespace SyncUp.Agent.Application.SyncUp.Services;
 
 public interface ISyncUpService
 {
-    public Task<IReadOnlyList<FileEntry>?> GetAgentFilesList();
+    public IReadOnlyList<FileEntry>? GetAgentFilesList();
     
     public Task<List<FileEntry>?> GetServerFilesList();
+
+    public Task SynchronizeAsync();
 }

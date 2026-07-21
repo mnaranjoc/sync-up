@@ -1,3 +1,4 @@
+using SyncUp.Agent.Application.Synchronization.Queue;
 using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Agent.Application.SyncUp;
 using SyncUp.Agent.Application.SyncUp.Services;
@@ -13,6 +14,7 @@ public class Program
         var builder = Host.CreateApplicationBuilder(args);
         builder.Services.AddSingleton<IFileService, FileService>();
         builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
+        builder.Services.AddSingleton<ISynchronizationQueue, SynchronizationQueue>();
         builder.Services.AddTransient<ISyncUpService, SyncUpService>();
         builder.Services.AddTransient<ISyncUpApiClient, SyncUpApiClient>();
         builder.Services.AddHostedService<WatcherTask>();

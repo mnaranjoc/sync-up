@@ -6,6 +6,7 @@ public static class Constants
 
     // Errors
     public const string ERROR_EMPTY_FILE = "File is empty.";
+    public const string ERROR_FILE_LOCKED = "File is locked and could not be accessed after multiple attempts.";
     public const string ERROR_UNEXPECTED = "An unexpected error occurred.";
     public const string ERROR_SERVER_LIST = "An error ocurred while retrieving the server file list.";
     public const string ERROR_SERVER_UPLOAD = "An error ocurred while uploading the file.";

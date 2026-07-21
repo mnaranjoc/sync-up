@@ -1,4 +1,5 @@
-﻿using SyncUp.Agent.Application.Synchronization.Services;
+﻿using SyncUp.Agent.Application.Synchronization.Queue;
+using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Agent.Infrastructure.Api;
 using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
@@ -8,22 +9,24 @@ namespace SyncUp.Agent.Application.SyncUp.Services;
 public class SyncUpService : ISyncUpService
 {
     private readonly IFileService _agentFilesService;
+    private readonly ISynchronizationQueue _queue;
     private readonly ISyncUpApiClient _apiClient;
     private readonly ILogger<SyncUpService> _logger;
     private bool firstTime = true;
 
-    public SyncUpService(IFileService agentFilesService, ISyncUpApiClient apiClient, ILogger<SyncUpService> logger)
+    public SyncUpService(IFileService agentFilesService, ISynchronizationQueue queue, ISyncUpApiClient apiClient, ILogger<SyncUpService> logger)
     {
         _agentFilesService = agentFilesService;
+        _queue = queue;
         _apiClient = apiClient;
         _logger = logger;
     }
 
-    public async Task<IReadOnlyList<FileEntry>?> GetAgentFilesList()
+    public IReadOnlyList<FileEntry>? GetAgentFilesList()
     {
         if (firstTime)
         {
-            await _agentFilesService.LoadFolderFilesOnStartup();
+            _agentFilesService.LoadFolderFilesOnStartup();
             firstTime = false;
         }
 
@@ -46,5 +49,17 @@ public class SyncUpService : ISyncUpService
         }
 
         return null;
+    }
+
+    public async Task SynchronizeAsync()
+    {
+        var operations = _queue.DequeueAll();
+
+        foreach (var operation in operations)
+        {
+            await operation.ExecuteAsync(_apiClient);
+
+            await Task.Delay(1000);
+        }
     }
 }

@@ -6,9 +6,9 @@ public interface IFileService
 {
     public IReadOnlyList<FileEntry> GetFiles();
 
-    public Task LoadFolderFilesOnStartup();
+    public void LoadFolderFilesOnStartup();
 
-    public Task AddFile(string path);
+    public void AddFile(string path);
 
     public Task RemoveFile(string path);
 
