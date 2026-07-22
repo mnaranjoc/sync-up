@@ -38,5 +38,17 @@ namespace SyncUp.Server.Services
 
             return newFile;
         }
+
+        public FileEntry? RenameFile(string oldPath, string newPath)
+        {
+            var file = GetFile(oldPath);
+
+            if (file == null)
+                throw new ArgumentNullException(nameof(file));
+
+            file.Path = newPath;
+
+            return file;
+        }
     }
 }

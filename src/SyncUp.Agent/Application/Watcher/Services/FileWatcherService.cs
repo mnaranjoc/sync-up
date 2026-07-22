@@ -78,7 +78,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
         }
     }
 
-    private async void OnCreated(object sender, FileSystemEventArgs e)
+    private void OnCreated(object sender, FileSystemEventArgs e)
     {
         var operation = new AddFile() { Path = e.FullPath };
         _queue.Queue(operation);
@@ -87,8 +87,11 @@ public class FileWatcherService : IFileWatcherService, IDisposable
     private async void OnDeleted(object sender, FileSystemEventArgs e)
         => await _agentFilesService.RemoveFile(e.FullPath);
 
-    private async void OnRenamed(object sender, RenamedEventArgs e)
-        => await _agentFilesService.RenameFile(e.OldFullPath, e.FullPath);
+    private void OnRenamed(object sender, RenamedEventArgs e)
+    {
+        var operation = new RenameFile() { OldPath = Path.GetFileName(e.OldFullPath), Path = Path.GetFileName(e.FullPath),  };
+        _queue.Queue(operation);
+    }
 
     private void OnError(object sender, ErrorEventArgs e)
     {

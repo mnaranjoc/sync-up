@@ -9,5 +9,7 @@ namespace SyncUp.Server.Services
         public FileEntry? GetFile(string path);
 
         public FileEntry? AddFile(IFormFile file);
+
+        public FileEntry? RenameFile(string oldPath, string newPath);
     }
 }

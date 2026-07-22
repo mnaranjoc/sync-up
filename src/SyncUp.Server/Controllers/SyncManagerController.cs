@@ -46,5 +46,16 @@ namespace SyncUp.Server.Controllers
 
             return CreatedAtAction(nameof(GetFile), new { path = newFile?.Path }, newFile);
         }
+
+        [HttpPut("file/{path}/rename")]
+        public ActionResult<FileEntry> RenameFile(string path, [FromBody] FileEntry file)
+        {
+            if (file == null || string.IsNullOrEmpty(file.Path))
+                return BadRequest(new { error = Constants.ERROR_SERVER_RENAMING });
+
+            var renamedFile = _serverFilesService.RenameFile(path, file.Path);
+
+            return Ok(renamedFile);
+        }
     }
 }

@@ -7,5 +7,7 @@ namespace SyncUp.Agent.Infrastructure.Api
         public Task<List<FileEntry>> GetFilesAsync();
 
         public Task AddFileAsync(MultipartFormDataContent content);
+
+        public Task RenameFileAsync(string path, HttpContent content);
     }
 }
