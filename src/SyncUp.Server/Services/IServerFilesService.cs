@@ -11,5 +11,7 @@ namespace SyncUp.Server.Services
         public FileEntry? AddFile(IFormFile file);
 
         public FileEntry? RenameFile(string oldPath, string newPath);
+
+        public void RemoveFile(string path);
     }
 }

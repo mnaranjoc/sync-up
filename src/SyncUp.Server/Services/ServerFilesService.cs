@@ -5,17 +5,17 @@ namespace SyncUp.Server.Services
 {
     public class ServerFilesService : IServerFilesService
     {
-        private readonly List<FileEntry> files = [];
+        private readonly List<FileEntry> _files = [];
 
         public IReadOnlyList<FileEntry> GetFiles()
-            => files;
+            => _files;
 
         public FileEntry? GetFile(string? path)
         {
             if (string.IsNullOrWhiteSpace(path))
                 return null;
 
-            return files.FirstOrDefault(x => string.Equals(x.Path, path, StringComparison.Ordinal));
+            return _files.FirstOrDefault(x => string.Equals(x.Path, path, StringComparison.Ordinal));
         }
 
         public FileEntry? AddFile(IFormFile file)
@@ -34,7 +34,7 @@ namespace SyncUp.Server.Services
                 Sha256 = Files.GetSHA256FromStream(stream)
             };
 
-            files.Add(newFile);
+            _files.Add(newFile);
 
             return newFile;
         }
@@ -49,6 +49,16 @@ namespace SyncUp.Server.Services
             file.Path = newPath;
 
             return file;
+        }
+
+        public void RemoveFile(string path)
+        {
+            var file = GetFile(path);
+
+            if (file == null)
+                throw new ArgumentNullException(nameof(file));
+
+            _files.Remove(file);
         }
     }
 }

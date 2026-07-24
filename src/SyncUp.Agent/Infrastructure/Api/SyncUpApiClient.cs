@@ -32,5 +32,11 @@ namespace SyncUp.Agent.Infrastructure.Api
             using var response = await _httpClient.PutAsync($"sync-manager/file/{path}/rename", content);
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task RemoveFileAsync(string path)
+        {
+            using var response = await _httpClient.DeleteAsync($"sync-manager/file/{path}");
+            response.EnsureSuccessStatusCode();
+        }
     }
 }

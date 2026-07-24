@@ -57,5 +57,18 @@ namespace SyncUp.Server.Controllers
 
             return Ok(renamedFile);
         }
+
+        [HttpDelete("file/{path}")]
+        public ActionResult RemoveFile(string path)
+        {
+            var file = _serverFilesService.GetFile(path);
+
+            if (file is null)
+                return NotFound();
+
+            _serverFilesService.RemoveFile(path);
+
+            return Ok();
+        }
     }
 }

@@ -1,6 +1,5 @@
 using SyncUp.Agent.Application.Synchronization.Queue;
 using SyncUp.Agent.Application.Synchronization.Queue.Operations;
-using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Application.Watcher.Services;
@@ -8,15 +7,13 @@ namespace SyncUp.Agent.Application.Watcher.Services;
 public class FileWatcherService : IFileWatcherService, IDisposable
 {
     private FileSystemWatcher? _watcher;
-    private readonly IFileService _agentFilesService;
     private readonly ISynchronizationQueue _queue;
     private readonly ILogger<FileWatcherService> _logger;
     private readonly object _lock = new();
     private bool _disposed;
 
-    public FileWatcherService(IFileService agentFilesService, ISynchronizationQueue queue, ILogger<FileWatcherService> logger)
+    public FileWatcherService(ISynchronizationQueue queue, ILogger<FileWatcherService> logger)
     {
-        _agentFilesService = agentFilesService;
         _queue = queue;
         _logger = logger;
     }
@@ -84,8 +81,11 @@ public class FileWatcherService : IFileWatcherService, IDisposable
         _queue.Queue(operation);
     }
 
-    private async void OnDeleted(object sender, FileSystemEventArgs e)
-        => await _agentFilesService.RemoveFile(e.FullPath);
+    private void OnDeleted(object sender, FileSystemEventArgs e)
+    {
+        var operation = new RemoveFile() {  Path = Path.GetFileName(e.FullPath) };
+        _queue.Queue(operation);
+    }
 
     private void OnRenamed(object sender, RenamedEventArgs e)
     {
