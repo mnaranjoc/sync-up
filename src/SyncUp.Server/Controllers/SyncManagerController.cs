@@ -25,10 +25,10 @@ namespace SyncUp.Server.Controllers
             return Ok(files);
         }
 
-        [HttpGet("file/{**path}")]
-        public ActionResult<FileEntry> GetFile(string path)
+        [HttpGet("file/{name}")]
+        public ActionResult<FileEntry> GetFile(string name)
         {
-            var file = _serverFilesService.GetFile(path);
+            var file = _serverFilesService.GetFile(name);
 
             if (file is null)
                 return NotFound();
@@ -44,29 +44,29 @@ namespace SyncUp.Server.Controllers
 
             var newFile = _serverFilesService.AddFile(file);
 
-            return CreatedAtAction(nameof(GetFile), new { path = newFile?.Path }, newFile);
+            return CreatedAtAction(nameof(GetFile), new { name = newFile?.Name }, newFile);
         }
 
-        [HttpPut("file/{path}/rename")]
-        public ActionResult<FileEntry> RenameFile(string path, [FromBody] FileEntry file)
+        [HttpPut("file/{name}/rename")]
+        public ActionResult<FileEntry> RenameFile(string name, [FromBody] FileEntry file)
         {
-            if (file == null || string.IsNullOrEmpty(file.Path))
+            if (file == null || string.IsNullOrEmpty(file.Name))
                 return BadRequest(new { error = Constants.ERROR_SERVER_RENAMING });
 
-            var renamedFile = _serverFilesService.RenameFile(path, file.Path);
+            var renamedFile = _serverFilesService.RenameFile(name, file.Name);
 
             return Ok(renamedFile);
         }
 
-        [HttpDelete("file/{path}")]
-        public ActionResult RemoveFile(string path)
+        [HttpDelete("file/{name}")]
+        public ActionResult RemoveFile(string name)
         {
-            var file = _serverFilesService.GetFile(path);
+            var file = _serverFilesService.GetFile(name);
 
             if (file is null)
                 return NotFound();
 
-            _serverFilesService.RemoveFile(path);
+            _serverFilesService.RemoveFile(name);
 
             return Ok();
         }

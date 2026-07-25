@@ -10,12 +10,12 @@ namespace SyncUp.Server.Services
         public IReadOnlyList<FileEntry> GetFiles()
             => _files;
 
-        public FileEntry? GetFile(string? path)
+        public FileEntry? GetFile(string? name)
         {
-            if (string.IsNullOrWhiteSpace(path))
+            if (string.IsNullOrWhiteSpace(name))
                 return null;
 
-            return _files.FirstOrDefault(x => string.Equals(x.Path, path, StringComparison.Ordinal));
+            return _files.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
 
         public FileEntry? AddFile(IFormFile file)
@@ -30,7 +30,7 @@ namespace SyncUp.Server.Services
             using var stream = file.OpenReadStream();
             var newFile = new FileEntry()
             {
-                Path = file.FileName,
+                Name = file.FileName,
                 Sha256 = Files.GetSHA256FromStream(stream)
             };
 
@@ -39,21 +39,21 @@ namespace SyncUp.Server.Services
             return newFile;
         }
 
-        public FileEntry? RenameFile(string oldPath, string newPath)
+        public FileEntry? RenameFile(string oldName, string newName)
         {
-            var file = GetFile(oldPath);
+            var file = GetFile(oldName);
 
             if (file == null)
                 throw new ArgumentNullException(nameof(file));
 
-            file.Path = newPath;
+            file.Name = newName;
 
             return file;
         }
 
-        public void RemoveFile(string path)
+        public void RemoveFile(string name)
         {
-            var file = GetFile(path);
+            var file = GetFile(name);
 
             if (file == null)
                 throw new ArgumentNullException(nameof(file));

@@ -11,18 +11,24 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
-        builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
+        
+        // Synchronization
         builder.Services.AddSingleton<ISynchronizationQueue, SynchronizationQueue>();
-        builder.Services.AddTransient<ISyncUpService, SyncUpService>();
-        builder.Services.AddTransient<ISyncUpApiClient, SyncUpApiClient>();
 
-        // Tasks
-        builder.Services.AddHostedService<WatcherTask>();
+        // SyncUp
         builder.Services.AddHostedService<SyncUpTask>();
+        builder.Services.AddTransient<ISyncUpService, SyncUpService>();
 
-        // API Http Client
+        // Watcher
+        builder.Services.AddHostedService<WatcherTask>();
+        builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
+
+        // Api client
+        builder.Services.AddSingleton<IApiClient, ApiClient>();
+
+        // Http client
         string apiUrl = builder.Configuration["Api"] ?? throw new InvalidOperationException("The 'Api' configuration key is missing.");
-        builder.Services.AddHttpClient<ISyncUpApiClient, SyncUpApiClient>(client => { client.BaseAddress = new Uri(apiUrl); });
+        builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiUrl); });
 
         var host = builder.Build();
         host.Run();

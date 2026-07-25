@@ -3,11 +3,11 @@ using System.Net.Http.Json;
 
 namespace SyncUp.Agent.Infrastructure.Api
 {
-    public class SyncUpApiClient : ISyncUpApiClient
+    public class ApiClient : IApiClient
     {
         private readonly HttpClient _httpClient;
 
-        public SyncUpApiClient(HttpClient httpClient)
+        public ApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -27,15 +27,15 @@ namespace SyncUp.Agent.Infrastructure.Api
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task RenameFileAsync(string path, HttpContent content)
+        public async Task RenameFileAsync(string name, HttpContent content)
         {
-            using var response = await _httpClient.PutAsync($"sync-manager/file/{path}/rename", content);
+            using var response = await _httpClient.PutAsync($"sync-manager/file/{name}/rename", content);
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task RemoveFileAsync(string path)
+        public async Task RemoveFileAsync(string name)
         {
-            using var response = await _httpClient.DeleteAsync($"sync-manager/file/{path}");
+            using var response = await _httpClient.DeleteAsync($"sync-manager/file/{name}");
             response.EnsureSuccessStatusCode();
         }
     }

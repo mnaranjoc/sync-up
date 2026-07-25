@@ -8,15 +8,17 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
 {
     public class RenameFile : IOperation
     {
-        public string Path { get; set; } = "";
+        public string? Name { get; set; } = "";
 
-        public string OldPath { get; set; } = "";
+        public string? FullPath { get; set; } = "";
 
-        public Task ExecuteAsync(ISyncUpApiClient apiClient)
+        public string? OldName { get; set; } = "";
+
+        public Task ExecuteAsync(IApiClient apiClient)
         {
             try
             {
-                var fileEntry = new FileEntry() { Path = Path };
+                var fileEntry = new FileEntry() { Name = Name };
 
                 var renameFileRequest = JsonSerializer.Serialize(fileEntry);
 
@@ -26,7 +28,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
                     "application/json"
                 );
 
-                return apiClient.RenameFileAsync(OldPath, content);
+                return apiClient.RenameFileAsync(OldName, content);
             }
             catch (HttpRequestException ex)
             {

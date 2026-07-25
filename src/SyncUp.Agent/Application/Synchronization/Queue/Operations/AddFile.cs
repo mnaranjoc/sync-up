@@ -5,13 +5,15 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
 {
     public class AddFile : IOperation
     {
-        public string Path { get; set; } = "";
+        public string? Name { get; set; } = "";
 
-        public string OldPath { get; set; } = "";
+        public string? FullPath { get; set; } = "";
 
-        public async Task ExecuteAsync(ISyncUpApiClient apiClient)
+        public string? OldName { get; set; } = "";
+
+        public async Task ExecuteAsync(IApiClient apiClient)
         {
-            FileStream? fileStream = await WaitForFileAccessAsync(Path, maxRetries: 5, delayMs: 500);
+            FileStream? fileStream = await WaitForFileAccessAsync(FullPath, maxRetries: 5, delayMs: 500);
 
             if (fileStream == null)
                 throw new Exception(Constants.ERROR_FILE_LOCKED);
@@ -22,8 +24,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
             {
                 try
                 {
-                    string fileName = System.IO.Path.GetFileName(Path);
-                    content.Add(streamContent, "file", fileName);
+                    content.Add(streamContent, "file", Name);
                     await apiClient.AddFileAsync(content);
                 }
                 catch (HttpRequestException ex)
@@ -37,13 +38,13 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
             }
         }
 
-        private async Task<FileStream?> WaitForFileAccessAsync(string filePath, int maxRetries, int delayMs)
+        private async Task<FileStream?> WaitForFileAccessAsync(string fullPath, int maxRetries, int delayMs)
         {
             for (int i = 0; i < maxRetries; i++)
             {
                 try
                 {
-                    return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    return new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 }
                 catch (IOException)
                 {

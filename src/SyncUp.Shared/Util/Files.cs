@@ -10,8 +10,8 @@ public class Files
         using var stream = File.OpenRead(path);
         var newFile = new FileEntry()
         {
-            Path = Path.GetFileName(path),
-            Sha256 = Files.GetSHA256FromStream(stream)
+            Name = Path.GetFileName(path),
+            Sha256 = GetSHA256FromStream(stream)
         };
 
         return newFile;
@@ -19,7 +19,7 @@ public class Files
     
     public static string? GetSHA256FromStream(Stream stream)
     {
-        string? result = null;
+        string? result;
 
         var hashBytes = SHA256.HashData(stream);
         result = Convert.ToHexString(hashBytes);

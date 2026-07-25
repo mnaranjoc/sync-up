@@ -9,7 +9,7 @@ namespace SyncUp.Agent.Application.SyncUp.Services;
 public class SyncUpService : ISyncUpService
 {
     private readonly ISynchronizationQueue _queue;
-    private readonly ISyncUpApiClient _apiClient;
+    private readonly IApiClient _apiClient;
     private readonly IConfiguration _config;
     private readonly ILogger<SyncUpService> _logger;
 
@@ -17,7 +17,7 @@ public class SyncUpService : ISyncUpService
 
     private bool _firstTime = true;
 
-    public SyncUpService(ISynchronizationQueue queue, ISyncUpApiClient apiClient, IConfiguration config, ILogger<SyncUpService> logger)
+    public SyncUpService(ISynchronizationQueue queue, IApiClient apiClient, IConfiguration config, ILogger<SyncUpService> logger)
     {
         _queue = queue;
         _apiClient = apiClient;
@@ -32,11 +32,12 @@ public class SyncUpService : ISyncUpService
             string dir = $"{_config[Constants.CONFIG_WATCH_DIRECTORY]}";
             var files = Files.GetFilesFromDirectory(dir);
 
-            foreach (var path in files)
+            foreach (string fullPath in files)
             {
-                _agentFilesList.Add(new FileEntry() { Path = path });
+                var name = Path.GetFileName(fullPath);
+                _agentFilesList.Add(new FileEntry() { Name = name, FullPath = fullPath });
 
-                var operation = new AddFile() { Path = path };
+                var operation = new AddFile() { Name = name, FullPath = fullPath };
                 _queue.Queue(operation);
             }
 

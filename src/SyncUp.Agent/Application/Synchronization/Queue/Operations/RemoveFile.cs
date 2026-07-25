@@ -5,15 +5,17 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
 {
     internal class RemoveFile : IOperation
     {
-        public string Path { get; set; } = "";
+        public string? Name { get; set; } = "";
 
-        public string OldPath { get; set; } = "";
+        public string? FullPath { get; set; } = "";
 
-        public Task ExecuteAsync(ISyncUpApiClient apiClient)
+        public string? OldName { get; set; } = "";
+
+        public Task ExecuteAsync(IApiClient apiClient)
         {
             try
             {
-                return apiClient.RemoveFileAsync(Path);
+                return apiClient.RemoveFileAsync(Name);
             }
             catch (HttpRequestException ex)
             {

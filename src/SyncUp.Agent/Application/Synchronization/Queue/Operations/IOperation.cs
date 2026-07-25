@@ -4,10 +4,12 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
 {
     public interface IOperation
     {
-        public string Path { get; set; }
+        public string? Name { get; set; }
 
-        public string OldPath { get; set; }
+        public string? FullPath { get; set; }
 
-        Task ExecuteAsync(ISyncUpApiClient apiClient);
+        public string? OldName { get; set; }
+
+        Task ExecuteAsync(IApiClient apiClient);
     }
 }

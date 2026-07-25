@@ -77,19 +77,19 @@ public class FileWatcherService : IFileWatcherService, IDisposable
 
     private void OnCreated(object sender, FileSystemEventArgs e)
     {
-        var operation = new AddFile() { Path = e.FullPath };
+        var operation = new AddFile() { Name = e.Name, FullPath = e.FullPath };
         _queue.Queue(operation);
     }
 
     private void OnDeleted(object sender, FileSystemEventArgs e)
     {
-        var operation = new RemoveFile() {  Path = Path.GetFileName(e.FullPath) };
+        var operation = new RemoveFile() { Name = e.Name };
         _queue.Queue(operation);
     }
 
     private void OnRenamed(object sender, RenamedEventArgs e)
     {
-        var operation = new RenameFile() { OldPath = Path.GetFileName(e.OldFullPath), Path = Path.GetFileName(e.FullPath),  };
+        var operation = new RenameFile() { OldName = e.OldName, Name = e.Name };
         _queue.Queue(operation);
     }
 

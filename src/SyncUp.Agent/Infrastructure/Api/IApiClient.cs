@@ -2,14 +2,14 @@
 
 namespace SyncUp.Agent.Infrastructure.Api
 {
-    public interface ISyncUpApiClient
+    public interface IApiClient
     {
         public Task<List<FileEntry>> GetFilesAsync();
 
         public Task AddFileAsync(MultipartFormDataContent content);
 
-        public Task RenameFileAsync(string path, HttpContent content);
+        public Task RenameFileAsync(string name, HttpContent content);
 
-        public Task RemoveFileAsync(string path);
+        public Task RemoveFileAsync(string name);
     }
 }
