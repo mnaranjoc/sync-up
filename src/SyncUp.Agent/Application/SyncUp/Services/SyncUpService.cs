@@ -1,5 +1,5 @@
 ﻿using SyncUp.Agent.Application.Synchronization.Queue;
-using SyncUp.Agent.Application.Synchronization.Services;
+using SyncUp.Agent.Application.Synchronization.Queue.Operations;
 using SyncUp.Agent.Infrastructure.Api;
 using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
@@ -8,29 +8,42 @@ namespace SyncUp.Agent.Application.SyncUp.Services;
 
 public class SyncUpService : ISyncUpService
 {
-    private readonly IFileService _agentFilesService;
     private readonly ISynchronizationQueue _queue;
     private readonly ISyncUpApiClient _apiClient;
+    private readonly IConfiguration _config;
     private readonly ILogger<SyncUpService> _logger;
-    private bool firstTime = true;
 
-    public SyncUpService(IFileService agentFilesService, ISynchronizationQueue queue, ISyncUpApiClient apiClient, ILogger<SyncUpService> logger)
+    private readonly List<FileEntry> _agentFilesList = new List<FileEntry>();
+
+    private bool _firstTime = true;
+
+    public SyncUpService(ISynchronizationQueue queue, ISyncUpApiClient apiClient, IConfiguration config, ILogger<SyncUpService> logger)
     {
-        _agentFilesService = agentFilesService;
         _queue = queue;
         _apiClient = apiClient;
+        _config = config;
         _logger = logger;
     }
 
     public IReadOnlyList<FileEntry>? GetAgentFilesList()
     {
-        if (firstTime)
+        if (_firstTime)
         {
-            _agentFilesService.LoadFolderFilesOnStartup();
-            firstTime = false;
+            string dir = $"{_config[Constants.CONFIG_WATCH_DIRECTORY]}";
+            var files = Files.GetFilesFromDirectory(dir);
+
+            foreach (var path in files)
+            {
+                _agentFilesList.Add(new FileEntry() { Path = path });
+
+                var operation = new AddFile() { Path = path };
+                _queue.Queue(operation);
+            }
+
+            _firstTime = false;
         }
 
-        return _agentFilesService.GetFiles();
+        return _agentFilesList;
     }
 
     public async Task<List<FileEntry>?> GetServerFilesList()
