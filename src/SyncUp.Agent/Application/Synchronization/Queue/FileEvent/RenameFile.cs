@@ -4,9 +4,9 @@ using SyncUp.Shared.Util;
 using System.Text;
 using System.Text.Json;
 
-namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
+namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 {
-    public class RenameFile : IOperation
+    public class RenameFile : IFileEvent
     {
         public string? Name { get; set; } = "";
 

@@ -1,28 +1,33 @@
-﻿using SyncUp.Agent.Application.Synchronization.Queue.Operations;
+﻿using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
 
 namespace SyncUp.Agent.Application.Synchronization.Queue
 {
     public class SynchronizationQueue : ISynchronizationQueue
     {
-        private readonly Queue<IOperation> _operations = new Queue<IOperation>();
+        private readonly Queue<IFileEvent> _fileEvents = new();
 
-        public void Queue(IOperation operation)
+        public void Queue(IFileEvent fileEvent)
         {
-            ArgumentNullException.ThrowIfNull(operation);
+            ArgumentNullException.ThrowIfNull(fileEvent);
 
-            _operations.Enqueue(operation);
+            _fileEvents.Enqueue(fileEvent);
         }
 
-        public IList<IOperation> DequeueAll()
+        public IList<IFileEvent> DequeueAll()
         {
-            var operations = new List<IOperation>();
+            var fileEvents = new List<IFileEvent>();
 
-            while (_operations.TryDequeue(out var operation))
+            while (_fileEvents.TryDequeue(out var fileEvent))
             {
-                operations.Add(operation);
+                fileEvents.Add(fileEvent);
             }
 
-            return operations;
+            return fileEvents;
+        }
+
+        public bool IsQueueEmpty()
+        {
+            return _fileEvents.Count == 0;
         }
     }
 }

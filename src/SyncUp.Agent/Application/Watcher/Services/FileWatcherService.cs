@@ -1,5 +1,5 @@
-using SyncUp.Agent.Application.Synchronization.Queue;
-using SyncUp.Agent.Application.Synchronization.Queue.Operations;
+using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
+using SyncUp.Agent.Application.SyncUp.Services;
 using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Application.Watcher.Services;
@@ -7,14 +7,14 @@ namespace SyncUp.Agent.Application.Watcher.Services;
 public class FileWatcherService : IFileWatcherService, IDisposable
 {
     private FileSystemWatcher? _watcher;
-    private readonly ISynchronizationQueue _queue;
+    private readonly ISyncUpService _service;
     private readonly ILogger<FileWatcherService> _logger;
     private readonly object _lock = new();
     private bool _disposed;
 
-    public FileWatcherService(ISynchronizationQueue queue, ILogger<FileWatcherService> logger)
+    public FileWatcherService(ISyncUpService service, ILogger<FileWatcherService> logger)
     {
-        _queue = queue;
+        _service = service;
         _logger = logger;
     }
 
@@ -77,20 +77,20 @@ public class FileWatcherService : IFileWatcherService, IDisposable
 
     private void OnCreated(object sender, FileSystemEventArgs e)
     {
-        var operation = new AddFile() { Name = e.Name, FullPath = e.FullPath };
-        _queue.Queue(operation);
+        var fileEvent = new AddFile() { Name = e.Name, FullPath = e.FullPath };
+        _service.SubmitChange(fileEvent);
     }
 
     private void OnDeleted(object sender, FileSystemEventArgs e)
     {
-        var operation = new RemoveFile() { Name = e.Name };
-        _queue.Queue(operation);
+        var fileEvent = new RemoveFile() { Name = e.Name };
+        _service.SubmitChange(fileEvent);
     }
 
     private void OnRenamed(object sender, RenamedEventArgs e)
     {
-        var operation = new RenameFile() { OldName = e.OldName, Name = e.Name };
-        _queue.Queue(operation);
+        var fileEvent = new RenameFile() { OldName = e.OldName, Name = e.Name };
+        _service.SubmitChange(fileEvent);
     }
 
     private void OnError(object sender, ErrorEventArgs e)

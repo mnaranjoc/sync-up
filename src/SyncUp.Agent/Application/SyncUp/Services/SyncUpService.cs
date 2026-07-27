@@ -1,6 +1,7 @@
 ﻿using SyncUp.Agent.Application.Synchronization.Queue;
-using SyncUp.Agent.Application.Synchronization.Queue.Operations;
+using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
 using SyncUp.Agent.Infrastructure.Api;
+using SyncUp.Shared.Enums;
 using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
 
@@ -15,6 +16,7 @@ public class SyncUpService : ISyncUpService
 
     private readonly List<FileEntry> _agentFilesList = new List<FileEntry>();
 
+    private SyncStatus _syncStatus;
     private bool _firstTime = true;
 
     public SyncUpService(ISynchronizationQueue queue, IApiClient apiClient, IConfiguration config, ILogger<SyncUpService> logger)
@@ -23,6 +25,37 @@ public class SyncUpService : ISyncUpService
         _apiClient = apiClient;
         _config = config;
         _logger = logger;
+    }
+
+    public SyncStatus GetSyncStatus()
+    {
+        return _syncStatus;
+    }
+
+    public void SetSyncStatus(SyncStatus syncStatus)
+    {
+        _syncStatus = syncStatus;
+    }
+
+    public void SubmitChange(IFileEvent fileEvent)
+    {
+        _queue.Queue(fileEvent);
+
+        SetSyncStatus(SyncStatus.OutOfSync);
+    }
+
+    public async Task InitializeSyncQueueAsync()
+    {
+        if (_syncStatus != SyncStatus.Unknown)
+            return;
+
+        // Get server files
+        var serverFiles = await GetServerFilesList();
+        _logger.LogInformation("Server has {Count} files.", serverFiles?.Count);
+
+        // Get agent files
+        var agentFiles = GetAgentFilesList();
+        _logger.LogInformation("Agent has {Count} files.", agentFiles?.Count);
     }
 
     public IReadOnlyList<FileEntry>? GetAgentFilesList()
@@ -37,8 +70,8 @@ public class SyncUpService : ISyncUpService
                 var name = Path.GetFileName(fullPath);
                 _agentFilesList.Add(new FileEntry() { Name = name, FullPath = fullPath });
 
-                var operation = new AddFile() { Name = name, FullPath = fullPath };
-                _queue.Queue(operation);
+                var fileEvent = new AddFile() { Name = name, FullPath = fullPath };
+                _queue.Queue(fileEvent);
             }
 
             _firstTime = false;
@@ -67,11 +100,28 @@ public class SyncUpService : ISyncUpService
 
     public async Task SynchronizeAsync()
     {
-        var operations = _queue.DequeueAll();
-
-        foreach (var operation in operations)
+        if (_syncStatus == SyncStatus.Unknown)
         {
-            await operation.ExecuteAsync(_apiClient);
+            await InitializeSyncQueueAsync();
+        }
+        else if (_syncStatus == SyncStatus.OutOfSync)
+        {
+            await ProcessQueueAsync();
+        }
+
+        if (_queue.IsQueueEmpty())
+            SetSyncStatus(SyncStatus.InSync);
+        else
+            SetSyncStatus(SyncStatus.OutOfSync);
+    }
+
+    public async Task ProcessQueueAsync()
+    {
+        var filEvents = _queue.DequeueAll();
+
+        foreach (var fileEvent in filEvents)
+        {
+            await fileEvent.ExecuteAsync(_apiClient);
 
             await Task.Delay(1000);
         }

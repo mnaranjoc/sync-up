@@ -17,7 +17,7 @@ public class Program
 
         // SyncUp
         builder.Services.AddHostedService<SyncUpTask>();
-        builder.Services.AddTransient<ISyncUpService, SyncUpService>();
+        builder.Services.AddSingleton<ISyncUpService, SyncUpService>();
 
         // Watcher
         builder.Services.AddHostedService<WatcherTask>();

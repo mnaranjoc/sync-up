@@ -1,11 +1,13 @@
-﻿using SyncUp.Agent.Application.Synchronization.Queue.Operations;
+﻿using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
 
 namespace SyncUp.Agent.Application.Synchronization.Queue
 {
     public interface ISynchronizationQueue
     {
-        void Queue(IOperation operation);
+        void Queue(IFileEvent fileEvent);
 
-        IList<IOperation> DequeueAll();
+        IList<IFileEvent> DequeueAll();
+
+        bool IsQueueEmpty();
     }
 }

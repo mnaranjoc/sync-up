@@ -1,9 +1,9 @@
 ﻿using SyncUp.Agent.Infrastructure.Api;
 using SyncUp.Shared.Util;
 
-namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
+namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 {
-    internal class RemoveFile : IOperation
+    internal class RemoveFile : IFileEvent
     {
         public string? Name { get; set; } = "";
 

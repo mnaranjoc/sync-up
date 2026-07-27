@@ -1,8 +1,8 @@
 ﻿using SyncUp.Agent.Infrastructure.Api;
 
-namespace SyncUp.Agent.Application.Synchronization.Queue.Operations
+namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 {
-    public interface IOperation
+    public interface IFileEvent
     {
         public string? Name { get; set; }
 
