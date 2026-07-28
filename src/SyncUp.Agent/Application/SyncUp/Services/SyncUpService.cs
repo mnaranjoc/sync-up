@@ -44,20 +44,6 @@ public class SyncUpService : ISyncUpService
         SetSyncStatus(SyncStatus.OutOfSync);
     }
 
-    public async Task InitializeSyncQueueAsync()
-    {
-        if (_syncStatus != SyncStatus.Unknown)
-            return;
-
-        // Get server files
-        var serverFiles = await GetServerFilesList();
-        _logger.LogInformation("Server has {Count} files.", serverFiles?.Count);
-
-        // Get agent files
-        var agentFiles = GetAgentFilesList();
-        _logger.LogInformation("Agent has {Count} files.", agentFiles?.Count);
-    }
-
     public IReadOnlyList<FileEntry>? GetAgentFilesList()
     {
         if (_firstTime)
@@ -68,10 +54,15 @@ public class SyncUpService : ISyncUpService
             foreach (string fullPath in files)
             {
                 var name = Path.GetFileName(fullPath);
-                _agentFilesList.Add(new FileEntry() { Name = name, FullPath = fullPath });
 
-                var fileEvent = new AddFile() { Name = name, FullPath = fullPath };
-                _queue.Queue(fileEvent);
+                _agentFilesList.Add(
+                    new FileEntry()
+                    {
+                        Name = name,
+                        Source = Location.Agent,
+                        FullPath = fullPath
+                    }
+                );
             }
 
             _firstTime = false;
@@ -80,7 +71,7 @@ public class SyncUpService : ISyncUpService
         return _agentFilesList;
     }
 
-    public async Task<List<FileEntry>?> GetServerFilesList()
+    public async Task<IReadOnlyList<FileEntry>?> GetServerFilesList()
     {
         try
         {
@@ -98,32 +89,75 @@ public class SyncUpService : ISyncUpService
         return null;
     }
 
+    public IList<FileEntry> GetSyncDifferences(IReadOnlyList<FileEntry> serverFiles, IReadOnlyList<FileEntry> agentFiles)
+    {
+        if (serverFiles == null || agentFiles == null)
+            return [];
+
+        var serverDifferences = serverFiles.ExceptBy(
+            agentFiles.Select(a => a.Name), s => s.Name);
+
+        var agentDifferences = agentFiles.ExceptBy(
+            serverFiles.Select(s => s.Name), a => a.Name);
+
+        var differences = serverDifferences.Concat(agentDifferences).ToList();
+
+        return differences;
+    }
+
     public async Task SynchronizeAsync()
     {
         if (_syncStatus == SyncStatus.Unknown)
-        {
             await InitializeSyncQueueAsync();
-        }
-        else if (_syncStatus == SyncStatus.OutOfSync)
-        {
-            await ProcessQueueAsync();
-        }
 
+        else if (_syncStatus == SyncStatus.OutOfSync)
+            await ProcessQueueAsync();
+    }
+
+    private async Task InitializeSyncQueueAsync()
+    {
+        if (_syncStatus != SyncStatus.Unknown)
+            return;
+
+        var serverFiles = await GetServerFilesList();
+        var agentFiles = GetAgentFilesList();
+        var differences = GetSyncDifferences(serverFiles, agentFiles);
+
+        if (differences.Count > 0)
+        {
+            foreach (var file in differences)
+            {
+                IFileEvent? fileEvent = null;
+
+                if (file.Source == Location.Agent)
+                    fileEvent = new AddFile() { Name = file.Name, FullPath = file.FullPath };
+
+                if (fileEvent != null)
+                    SubmitChange(fileEvent);
+            }
+
+            RefreshSyncStatusFromQueue();
+        }
+    }
+
+    private async Task ProcessQueueAsync()
+    {
+        var fileEvents = _queue.DequeueAll();
+
+        if (fileEvents.Count > 0)
+        {
+            foreach (var fileEvent in fileEvents)
+                await fileEvent.ExecuteAsync(_apiClient);
+
+            RefreshSyncStatusFromQueue();
+        }
+    }
+
+    private void RefreshSyncStatusFromQueue()
+    {
         if (_queue.IsQueueEmpty())
             SetSyncStatus(SyncStatus.InSync);
         else
             SetSyncStatus(SyncStatus.OutOfSync);
-    }
-
-    public async Task ProcessQueueAsync()
-    {
-        var filEvents = _queue.DequeueAll();
-
-        foreach (var fileEvent in filEvents)
-        {
-            await fileEvent.ExecuteAsync(_apiClient);
-
-            await Task.Delay(1000);
-        }
     }
 }

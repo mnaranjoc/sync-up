@@ -1,11 +1,19 @@
-﻿using SyncUp.Shared.Models;
+﻿using SyncUp.Shared.Enums;
+using SyncUp.Shared.Models;
 using SyncUp.Shared.Util;
 
 namespace SyncUp.Server.Services
 {
     public class ServerFilesService : IServerFilesService
     {
-        private readonly List<FileEntry> _files = [];
+        private readonly List<FileEntry> _files = [
+            new FileEntry()
+            {
+                Name = "ServerFile.txt",
+                Source = Location.Server,
+                Sha256 = "559AEAD08264D5795D3909718CDD05ABD49572E84FE55590EEF31A88A08FDFFD"
+            }
+        ];
 
         public IReadOnlyList<FileEntry> GetFiles()
             => _files;

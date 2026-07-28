@@ -1,4 +1,6 @@
-﻿namespace SyncUp.Shared.Models
+﻿using SyncUp.Shared.Enums;
+
+namespace SyncUp.Shared.Models
 {
     public class FileEntry
     {
@@ -7,5 +9,7 @@
         public string? FullPath { get; set; }
 
         public string? Sha256 { get; set; }
+
+        public Location Source { get; set; }
     }
 }

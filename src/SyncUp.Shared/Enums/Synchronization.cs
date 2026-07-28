@@ -6,4 +6,11 @@
         OutOfSync,
         InSync
     }
+
+    public enum Location
+    {
+        None,
+        Agent,
+        Server
+    }
 }

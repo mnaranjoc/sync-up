@@ -14,7 +14,9 @@ public interface ISyncUpService
 
     public IReadOnlyList<FileEntry>? GetAgentFilesList();
     
-    public Task<List<FileEntry>?> GetServerFilesList();
+    public Task<IReadOnlyList<FileEntry>?> GetServerFilesList();
+
+    public IList<FileEntry> GetSyncDifferences(IReadOnlyList<FileEntry> serverFiles, IReadOnlyList<FileEntry> agentFiles);
 
     public Task SynchronizeAsync();
 }
