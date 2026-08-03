@@ -10,6 +10,6 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public string? OldName { get; set; }
 
-        Task ExecuteAsync(IApiClient apiClient);
+        Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken);
     }
 }

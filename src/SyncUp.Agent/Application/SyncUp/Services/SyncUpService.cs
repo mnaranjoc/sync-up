@@ -40,6 +40,11 @@ public class SyncUpService : ISyncUpService
         _syncStatus = syncStatus;
     }
 
+    public bool IsOutOfSync()
+    {
+        return GetSyncStatus() != SyncStatus.InSync;
+    }
+
     public void SubmitChange(IFileEvent fileEvent)
     {
         _queue.Queue(fileEvent);
@@ -73,11 +78,11 @@ public class SyncUpService : ISyncUpService
         return _agentFilesList;
     }
 
-    public async Task<IReadOnlyList<FileEntry>?> GetServerFilesList()
+    private async Task<IReadOnlyList<FileEntry>?> GetServerFilesList(CancellationToken cancellationToken)
     {
         try
         {
-            return await _apiClient.GetFilesAsync();
+            return await _apiClient.GetFilesAsync(cancellationToken);
         }
         catch (HttpRequestException)
         {
@@ -107,21 +112,21 @@ public class SyncUpService : ISyncUpService
         return differences;
     }
 
-    public async Task SynchronizeAsync()
+    public async Task SynchronizeAsync(CancellationToken cancellationToken)
     {
         if (_syncStatus == SyncStatus.Unknown)
-            await InitializeSyncQueueAsync();
+            await InitializeSyncQueueAsync(cancellationToken);
 
         else if (_syncStatus == SyncStatus.OutOfSync)
-            await ProcessQueueAsync();
+            await ProcessQueueAsync(cancellationToken);
     }
 
-    private async Task InitializeSyncQueueAsync()
+    private async Task InitializeSyncQueueAsync(CancellationToken cancellationToken)
     {
         if (_syncStatus != SyncStatus.Unknown)
             return;
 
-        var serverFiles = await GetServerFilesList();
+        var serverFiles = await GetServerFilesList(cancellationToken);
         var agentFiles = GetAgentFilesList();
         var differences = GetSyncDifferences(serverFiles, agentFiles);
 
@@ -155,14 +160,14 @@ public class SyncUpService : ISyncUpService
         }
     }
 
-    private async Task ProcessQueueAsync()
+    private async Task ProcessQueueAsync(CancellationToken cancellationToken)
     {
         var fileEvents = _queue.DequeueAll();
 
         if (fileEvents.Count > 0)
         {
             foreach (var fileEvent in fileEvents)
-                await fileEvent.ExecuteAsync(_apiClient);
+                await fileEvent.ExecuteAsync(_apiClient, cancellationToken);
 
             RefreshSyncStatusFromQueue();
         }

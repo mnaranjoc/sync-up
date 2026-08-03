@@ -10,13 +10,13 @@ public interface ISyncUpService
 
     public void SetSyncStatus(SyncStatus syncStatus);
 
+    public bool IsOutOfSync();
+
     public void SubmitChange(IFileEvent fileEvent);
 
     public IReadOnlyList<FileEntry>? GetAgentFilesList();
-    
-    public Task<IReadOnlyList<FileEntry>?> GetServerFilesList();
 
     public IList<FileEntry> GetSyncDifferences(IReadOnlyList<FileEntry> serverFiles, IReadOnlyList<FileEntry> agentFiles);
 
-    public Task SynchronizeAsync();
+    public Task SynchronizeAsync(CancellationToken cancellationToken);
 }

@@ -14,7 +14,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public string? OldName { get; set; } = "";
 
-        public Task ExecuteAsync(IApiClient apiClient)
+        public async Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
                     "application/json"
                 );
 
-                return apiClient.RenameFileAsync(OldName, content);
+                await apiClient.RenameFileAsync(OldName, content, cancellationToken);
             }
             catch (HttpRequestException ex)
             {

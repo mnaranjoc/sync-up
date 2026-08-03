@@ -1,25 +1,23 @@
 ﻿using SyncUp.Agent.Application.SyncUp.Services;
-using SyncUp.Shared.Enums;
 
-namespace SyncUp.Agent.Application.SyncUp
+namespace SyncUp.Agent.Application.SyncUp;
+
+public class SyncUpTask : BackgroundService
 {
-    public class SyncUpTask : BackgroundService
+    private readonly ISyncUpService _service;
+
+    public SyncUpTask(ISyncUpService service)
     {
-        private readonly ISyncUpService _service;
+        _service = service;
+    }
 
-        public SyncUpTask(ISyncUpService service)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _service = service;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
+            if (_service.IsOutOfSync())
             {
-                if (_service.GetSyncStatus() != SyncStatus.InSync)
-                {
-                    await _service.SynchronizeAsync();
-                }
+                await _service.SynchronizeAsync(stoppingToken);
             }
         }
     }

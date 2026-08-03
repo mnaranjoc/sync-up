@@ -11,11 +11,11 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public string? OldName { get; set; } = "";
 
-        public Task ExecuteAsync(IApiClient apiClient)
+        public Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken)
         {
             try
             {
-                return apiClient.RemoveFileAsync(Name);
+                return apiClient.RemoveFileAsync(Name, cancellationToken);
             }
             catch (HttpRequestException ex)
             {

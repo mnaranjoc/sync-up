@@ -11,15 +11,15 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public string? OldName { get; set; } = "";
 
-        public async Task ExecuteAsync(IApiClient apiClient)
+        public async Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken)
         {
             try
             {
-                var file = await apiClient.GetFileAsync($"{Name}");
+                var file = await apiClient.GetFileAsync($"{Name}", cancellationToken);
 
                 if (file != null)
                 {
-                    await File.WriteAllTextAsync($"{FullPath}", string.Empty);
+                    await File.WriteAllTextAsync($"{FullPath}", string.Empty, cancellationToken);
                 }
             }
             catch (HttpRequestException ex)
