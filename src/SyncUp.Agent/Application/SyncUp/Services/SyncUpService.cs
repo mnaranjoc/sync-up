@@ -14,6 +14,7 @@ public class SyncUpService : ISyncUpService
     private readonly IConfiguration _config;
     private readonly ILogger<SyncUpService> _logger;
 
+    private readonly string _agentWatchDirectory;
     private readonly List<FileEntry> _agentFilesList = new List<FileEntry>();
 
     private SyncStatus _syncStatus;
@@ -25,6 +26,8 @@ public class SyncUpService : ISyncUpService
         _apiClient = apiClient;
         _config = config;
         _logger = logger;
+
+        _agentWatchDirectory = $"{_config[Constants.CONFIG_WATCH_DIRECTORY]}";
     }
 
     public SyncStatus GetSyncStatus()
@@ -48,8 +51,7 @@ public class SyncUpService : ISyncUpService
     {
         if (_firstTime)
         {
-            string dir = $"{_config[Constants.CONFIG_WATCH_DIRECTORY]}";
-            var files = Files.GetFilesFromDirectory(dir);
+            var files = Files.GetFilesFromDirectory(_agentWatchDirectory);
 
             foreach (string fullPath in files)
             {
@@ -129,8 +131,21 @@ public class SyncUpService : ISyncUpService
             {
                 IFileEvent? fileEvent = null;
 
+                if (file.Source == Location.Server)
+                {
+                    var fileName = $"{file.Name}";
+                    var fullPath = Path.Combine(_agentWatchDirectory, fileName);
+
+                    fileEvent = new GetFile() { Name = fileName, FullPath = fullPath };
+                }
+
                 if (file.Source == Location.Agent)
-                    fileEvent = new AddFile() { Name = file.Name, FullPath = file.FullPath };
+                {
+                    var fileName = $"{file.Name}";
+                    var fullPath = $"{file.FullPath}";
+
+                    fileEvent = new AddFile() { Name = fileName, FullPath = fullPath };
+                }
 
                 if (fileEvent != null)
                     SubmitChange(fileEvent);

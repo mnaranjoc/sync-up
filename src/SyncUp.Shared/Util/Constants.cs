@@ -9,6 +9,7 @@ public static class Constants
     public const string ERROR_FILE_LOCKED = "File is locked and could not be accessed after multiple attempts.";
     public const string ERROR_UNEXPECTED = "An unexpected error occurred.";
     public const string ERROR_SERVER_LIST = "An error ocurred while retrieving the server file list.";
+    public const string ERROR_SERVER_GET = "An error ocurred while retrieving the server file.";
     public const string ERROR_SERVER_UPLOAD = "An error ocurred while uploading the file.";
     public const string ERROR_SERVER_RENAME = "An error ocurred while renaming the file.";
     public const string ERROR_SERVER_REMOVE = "An error ocurred while removing the file.";

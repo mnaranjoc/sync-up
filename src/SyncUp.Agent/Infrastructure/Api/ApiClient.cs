@@ -21,6 +21,15 @@ namespace SyncUp.Agent.Infrastructure.Api
             return files ?? [];
         }
 
+        public async Task<FileEntry?> GetFileAsync(string name)
+        {
+            using var response = await _httpClient.GetAsync($"sync-manager/file/{name}");
+            response.EnsureSuccessStatusCode();
+
+            var file = await response.Content.ReadFromJsonAsync<FileEntry>();
+            return file ?? null;
+        }
+
         public async Task AddFileAsync(MultipartFormDataContent content)
         {
             using var response = await _httpClient.PostAsync("sync-manager/file", content);
