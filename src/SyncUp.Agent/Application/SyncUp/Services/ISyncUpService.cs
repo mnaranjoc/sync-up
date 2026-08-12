@@ -14,9 +14,5 @@ public interface ISyncUpService
 
     public void SubmitChange(IFileEvent fileEvent);
 
-    public IReadOnlyList<FileEntry>? GetAgentFilesList();
-
-    public IList<FileEntry> GetSyncDifferences(IReadOnlyList<FileEntry> serverFiles, IReadOnlyList<FileEntry> agentFiles);
-
     public Task SynchronizeAsync(CancellationToken cancellationToken);
 }
