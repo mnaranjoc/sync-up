@@ -48,4 +48,15 @@ public class Files
 
         return files;
     }
+
+    public static string FixFilePath(string path)
+    {
+        if (path.StartsWith("~/"))
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            return Path.Combine(home, path.Substring(2));
+        }
+        
+        return path;
+    }
 }

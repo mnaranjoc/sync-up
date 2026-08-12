@@ -1,3 +1,4 @@
+using System.Net;
 using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
 using SyncUp.Agent.Application.SyncUp.Services;
 using SyncUp.Shared.Util;
@@ -20,23 +21,15 @@ public class FileWatcherService : IFileWatcherService, IDisposable
 
     public void Start(string path)
     {
+        path = Files.FixFilePath(path);
+
         lock (_lock)
         {
             if (_watcher != null) return;
 
             if (string.IsNullOrEmpty(path)) throw new Exception(Constants.PATH_NOT_PROVIDED);
 
-            if (!Directory.Exists(path))
-            {
-                if (path.StartsWith("~/"))
-                {
-                    var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                    path = Path.Combine(home, path.Substring(2));
-                }
-                
-                if (!Directory.Exists(path))
-                    throw new Exception(Constants.FOLDER_DOESNT_EXIST);
-            }
+            if (!Directory.Exists(path)) throw new Exception(Constants.FOLDER_DOESNT_EXIST);
 
             _watcher = new FileSystemWatcher(path)
             {

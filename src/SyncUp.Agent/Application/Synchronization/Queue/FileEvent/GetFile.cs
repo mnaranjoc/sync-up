@@ -19,7 +19,8 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
                 if (file != null)
                 {
-                    await File.WriteAllTextAsync($"{FullPath}", string.Empty, cancellationToken);
+                    var path = Files.FixFilePath($"{FullPath}");
+                    await File.WriteAllTextAsync(path, string.Empty, cancellationToken);
                 }
             }
             catch (HttpRequestException ex)
