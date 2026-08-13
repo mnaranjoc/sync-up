@@ -28,7 +28,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
                     "application/json"
                 );
 
-                await apiClient.RenameFileAsync(OldName, content, cancellationToken);
+                await apiClient.RenameFileAsync($"{OldName}", content, cancellationToken);
             }
             catch (HttpRequestException ex)
             {

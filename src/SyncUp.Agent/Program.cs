@@ -1,6 +1,8 @@
+using SyncUp.Agent.Application.Synchronization;
 using SyncUp.Agent.Application.Synchronization.Queue;
+using SyncUp.Agent.Application.Synchronization.Services;
+using SyncUp.Agent.Application.Synchronization.Services.Strategy;
 using SyncUp.Agent.Application.SyncUp;
-using SyncUp.Agent.Application.SyncUp.Services;
 using SyncUp.Agent.Application.Watcher.Services;
 using SyncUp.Agent.Infrastructure.Api;
 
@@ -16,8 +18,8 @@ public class Program
         builder.Services.AddSingleton<ISynchronizationQueue, SynchronizationQueue>();
 
         // SyncUp
-        builder.Services.AddHostedService<SyncUpTask>();
-        builder.Services.AddSingleton<ISyncUpService, SyncUpService>();
+        builder.Services.AddHostedService<SynchronizationTask>();
+        builder.Services.AddSingleton<ISynchronizationService, SynchronizationService>();
         builder.Services.AddTransient<ISynchronizationStrategy, UnknownSyncStrategy>();
         builder.Services.AddTransient<ISynchronizationStrategy, OutOfSyncStrategy>();
         builder.Services.AddTransient<ISynchronizationStrategy, InSyncStrategy>();

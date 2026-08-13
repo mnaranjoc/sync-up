@@ -1,13 +1,11 @@
 ﻿using SyncUp.Agent.Application.Synchronization.Queue;
 using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
-using SyncUp.Agent.Infrastructure.Api;
+using SyncUp.Agent.Application.Synchronization.Services.Strategy;
 using SyncUp.Shared.Enums;
-using SyncUp.Shared.Models;
-using SyncUp.Shared.Util;
 
-namespace SyncUp.Agent.Application.SyncUp.Services;
+namespace SyncUp.Agent.Application.Synchronization.Services;
 
-public class SyncUpService : ISyncUpService
+public class SynchronizationService : ISynchronizationService
 {
     private readonly IEnumerable<ISynchronizationStrategy> _strategies;
     private readonly ISynchronizationQueue _queue;
@@ -15,7 +13,7 @@ public class SyncUpService : ISyncUpService
     private SyncStatus _syncStatus;
     
 
-    public SyncUpService(IEnumerable<ISynchronizationStrategy> strategies, ISynchronizationQueue queue)
+    public SynchronizationService(IEnumerable<ISynchronizationStrategy> strategies, ISynchronizationQueue queue)
     {
         _strategies = strategies;
         _queue = queue;
@@ -57,9 +55,8 @@ public class SyncUpService : ISyncUpService
 
     private void RefreshSyncStatusFromQueue()
     {
-        if (_queue.IsQueueEmpty())
-            SetSyncStatus(SyncStatus.InSync);
-        else
-            SetSyncStatus(SyncStatus.OutOfSync);
+        var syncStatus = _queue.IsQueueEmpty() ? SyncStatus.InSync : SyncStatus.OutOfSync;
+
+        SetSyncStatus(syncStatus);
     }
 }

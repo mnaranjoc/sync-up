@@ -1,12 +1,12 @@
-﻿using SyncUp.Agent.Application.SyncUp.Services;
+﻿using SyncUp.Agent.Application.Synchronization.Services;
 
-namespace SyncUp.Agent.Application.SyncUp;
+namespace SyncUp.Agent.Application.Synchronization;
 
-public class SyncUpTask : BackgroundService
+public class SynchronizationTask : BackgroundService
 {
-    private readonly ISyncUpService _service;
+    private readonly ISynchronizationService _service;
 
-    public SyncUpTask(ISyncUpService service)
+    public SynchronizationTask(ISynchronizationService service)
     {
         _service = service;
     }

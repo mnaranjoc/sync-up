@@ -13,10 +13,8 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public async Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken)
         {
-            FileStream? fileStream = await WaitForFileAccessAsync(FullPath, maxRetries: 5, delayMs: 500, cancellationToken);
-
-            if (fileStream == null)
-                throw new Exception(Constants.ERROR_FILE_LOCKED);
+            FileStream? fileStream = await WaitForFileAccessAsync($"{FullPath}", maxRetries: 5, delayMs: 500, cancellationToken)
+                ?? throw new Exception(Constants.ERROR_FILE_LOCKED);
 
             using (fileStream)
             using (var streamContent = new StreamContent(fileStream))
@@ -24,7 +22,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
             {
                 try
                 {
-                    content.Add(streamContent, "file", Name);
+                    content.Add(streamContent, "file", $"{Name}");
                     await apiClient.AddFileAsync(content, cancellationToken);
                 }
                 catch (HttpRequestException ex)
@@ -38,7 +36,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
             }
         }
 
-        private async Task<FileStream?> WaitForFileAccessAsync(string fullPath, int maxRetries, int delayMs, CancellationToken cancellationToken)
+        private static async Task<FileStream?> WaitForFileAccessAsync(string fullPath, int maxRetries, int delayMs, CancellationToken cancellationToken)
         {
             for (int i = 0; i < maxRetries; i++)
             {

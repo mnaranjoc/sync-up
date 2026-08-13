@@ -1,6 +1,6 @@
 using System.Net;
 using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
-using SyncUp.Agent.Application.SyncUp.Services;
+using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Application.Watcher.Services;
@@ -8,12 +8,12 @@ namespace SyncUp.Agent.Application.Watcher.Services;
 public class FileWatcherService : IFileWatcherService, IDisposable
 {
     private FileSystemWatcher? _watcher;
-    private readonly ISyncUpService _service;
+    private readonly ISynchronizationService _service;
     private readonly ILogger<FileWatcherService> _logger;
     private readonly object _lock = new();
     private bool _disposed;
 
-    public FileWatcherService(ISyncUpService service, ILogger<FileWatcherService> logger)
+    public FileWatcherService(ISynchronizationService service, ILogger<FileWatcherService> logger)
     {
         _service = service;
         _logger = logger;

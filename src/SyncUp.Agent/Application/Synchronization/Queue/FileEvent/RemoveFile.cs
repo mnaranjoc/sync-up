@@ -15,7 +15,7 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
         {
             try
             {
-                return apiClient.RemoveFileAsync(Name, cancellationToken);
+                return apiClient.RemoveFileAsync($"{Name}", cancellationToken);
             }
             catch (HttpRequestException ex)
             {

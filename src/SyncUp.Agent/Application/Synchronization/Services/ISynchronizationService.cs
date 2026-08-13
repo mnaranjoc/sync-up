@@ -1,10 +1,9 @@
 ﻿using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
 using SyncUp.Shared.Enums;
-using SyncUp.Shared.Models;
 
-namespace SyncUp.Agent.Application.SyncUp.Services;
+namespace SyncUp.Agent.Application.Synchronization.Services;
 
-public interface ISyncUpService
+public interface ISynchronizationService
 {
     public SyncStatus GetSyncStatus();
 
