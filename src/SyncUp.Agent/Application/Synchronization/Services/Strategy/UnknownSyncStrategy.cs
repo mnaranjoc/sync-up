@@ -23,16 +23,16 @@ public class UnknownSyncStrategy : ISynchronizationStrategy
         _logger = logger;
     }
 
-    public async Task RunAsync(CancellationToken cancellationToken)
+    public async Task<SyncStatus> RunAsync(CancellationToken cancellationToken)
     {
-        await Task.Delay(1000, cancellationToken);
-
-        var serverFiles = await GetServerFilesList(cancellationToken);
-        var agentFiles = GetAgentFilesList();
-        var differences = GetSyncDifferences(serverFiles, agentFiles);
-
-        if (differences.Count > 0)
+        try
         {
+            var serverFiles = await GetServerFilesList(cancellationToken) ?? throw new Exception();
+            var agentFiles = GetAgentFilesList() ?? throw new Exception();
+            var differences = GetSyncDifferences(serverFiles, agentFiles);
+
+            if (differences.Count == 0) return SyncStatus.InSync;
+
             foreach (var file in differences)
             {
                 IFileEvent? fileEvent = null;
@@ -56,6 +56,12 @@ public class UnknownSyncStrategy : ISynchronizationStrategy
                 if (fileEvent != null)
                     _queue.Queue(fileEvent);
             }
+
+            return SyncStatus.OutOfSync;
+        }
+        catch (Exception ex)
+        {
+            return SyncStatus;
         }
     }
 
@@ -100,19 +106,15 @@ public class UnknownSyncStrategy : ISynchronizationStrategy
         return _agentFilesList;
     }
 
-    public IList<FileEntry> GetSyncDifferences(IReadOnlyList<FileEntry>? serverFiles, IReadOnlyList<FileEntry>? agentFiles)
+    public static IList<FileEntry> GetSyncDifferences(IReadOnlyList<FileEntry>? serverFiles, IReadOnlyList<FileEntry>? agentFiles)
     {
-        if (serverFiles == null || agentFiles == null)
-            return [];
+        ArgumentNullException.ThrowIfNull(serverFiles);
+        ArgumentNullException.ThrowIfNull(agentFiles);
 
-        var serverDifferences = serverFiles.ExceptBy(
-            agentFiles.Select(a => a.Name), s => s.Name);
-
-        var agentDifferences = agentFiles.ExceptBy(
-            serverFiles.Select(s => s.Name), a => a.Name);
-
+        var serverDifferences = serverFiles.ExceptBy(agentFiles.Select(a => a.Name), s => s.Name);
+        var agentDifferences = agentFiles.ExceptBy(serverFiles.Select(s => s.Name), a => a.Name);
         var differences = serverDifferences.Concat(agentDifferences).ToList();
 
-        return differences;
+        return differences ?? [];
     }
 }

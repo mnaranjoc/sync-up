@@ -14,6 +14,8 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public string? OldName { get; set; } = "";
 
+        public int Delay { get; set; }
+
         public async Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken)
         {
             try

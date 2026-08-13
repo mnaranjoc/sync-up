@@ -6,7 +6,7 @@ public class InSyncStrategy : ISynchronizationStrategy
 {
     public SyncStatus SyncStatus => SyncStatus.InSync;
 
-    public Task RunAsync(CancellationToken cancellationToken)
+    public Task<SyncStatus> RunAsync(CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

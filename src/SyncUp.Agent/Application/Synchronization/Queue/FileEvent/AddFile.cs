@@ -11,10 +11,14 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public string? OldName { get; set; } = "";
 
+        public int Delay { get; set; }
+
         public async Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken)
         {
             FileStream? fileStream = await WaitForFileAccessAsync($"{FullPath}", maxRetries: 5, delayMs: 500, cancellationToken)
                 ?? throw new Exception(Constants.ERROR_FILE_LOCKED);
+
+            if (string.Equals(Name, "a.txt")) throw new Exception("TEST");
 
             using (fileStream)
             using (var streamContent = new StreamContent(fileStream))

@@ -13,6 +13,14 @@ namespace SyncUp.Agent.Application.Synchronization.Queue
             _fileEvents.Enqueue(fileEvent);
         }
 
+        public void EnqueueAll(List<IFileEvent> fileEvents)
+        {
+            ArgumentNullException.ThrowIfNull(fileEvents);
+
+            foreach (var fileEvent in fileEvents)
+                _fileEvents.Enqueue(fileEvent);
+        }
+
         public IList<IFileEvent> DequeueAll()
         {
             var fileEvents = new List<IFileEvent>();

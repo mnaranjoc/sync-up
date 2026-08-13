@@ -6,5 +6,5 @@ public interface ISynchronizationStrategy
 {
     public SyncStatus SyncStatus { get; }
 
-    Task RunAsync(CancellationToken cancellationToken);
+    Task<SyncStatus> RunAsync(CancellationToken cancellationToken);
 }

@@ -48,15 +48,8 @@ public class SynchronizationService : ISynchronizationService
         if (strategy == null)
             return;
 
-        await strategy.RunAsync(cancellationToken);
+        var updatedStatus = await strategy.RunAsync(cancellationToken);
 
-        RefreshSyncStatusFromQueue();
-    }
-
-    private void RefreshSyncStatusFromQueue()
-    {
-        var syncStatus = _queue.IsQueueEmpty() ? SyncStatus.InSync : SyncStatus.OutOfSync;
-
-        SetSyncStatus(syncStatus);
+        SetSyncStatus(updatedStatus);
     }
 }
