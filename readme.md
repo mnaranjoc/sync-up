@@ -64,3 +64,33 @@ Uses SQLite as the primary persistence layer.
 ## Purpose
 
 A learning project to explore file synchronization, system design, and cross-platform backend development with .NET.
+
+## Testing & Coverage
+
+### Prerequisites
+
+To generate visual HTML coverage reports, ensure you have the global code coverage report generation tool installed on your system:
+
+`dotnet tool install -g dotnet-reportgenerator-globaltool`
+
+> **Note (macOS/Linux):** Make sure `~/.dotnet/tools` is added to your `$PATH`.
+
+### Running Unit Tests
+
+To execute all unit tests across the repository:
+
+`dotnet test`
+
+### Generating Code Coverage Reports
+
+1. **Execute tests and export coverage data:**
+
+   `dotnet test --collect:"XPlat Code Coverage"`
+
+2. **Generate the interactive HTML report:**
+
+   `reportgenerator -reports:"<path-to-coverage-file>/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html`
+
+3. **Inspect results:**
+
+   Open `coveragereport/index.html` in a web browser to review detailed line-by-line code coverage metrics.
