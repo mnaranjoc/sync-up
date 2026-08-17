@@ -422,3 +422,12 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# macOS system files
+.DS_Store
+.DS_Store?
+._*
+
+# Test results & coverage reports
+TestResults/
+coveragereport/
