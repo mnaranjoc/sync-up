@@ -9,8 +9,6 @@ public interface ISynchronizationService
 
     public void SetSyncStatus(SyncStatus syncStatus);
 
-    public bool IsOutOfSync();
-
     public void SubmitChange(IFileEvent fileEvent);
 
     public Task SynchronizeAsync(CancellationToken cancellationToken);

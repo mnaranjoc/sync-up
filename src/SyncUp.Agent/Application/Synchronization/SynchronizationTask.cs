@@ -15,10 +15,7 @@ public class SynchronizationTask : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            if (_service.IsOutOfSync())
-            {
-                await _service.SynchronizeAsync(stoppingToken);
-            }
+            await _service.SynchronizeAsync(stoppingToken);
         }
     }
 }

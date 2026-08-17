@@ -29,7 +29,7 @@ public class SynchronizationService : ISynchronizationService
         _syncStatus = syncStatus;
     }
 
-    public bool IsOutOfSync()
+    private bool IsOutOfSync()
     {
         return GetSyncStatus() != SyncStatus.InSync;
     }
@@ -43,13 +43,12 @@ public class SynchronizationService : ISynchronizationService
 
     public async Task SynchronizeAsync(CancellationToken cancellationToken)
     {
-        var strategy = _strategies.FirstOrDefault(s => s.SyncStatus == _syncStatus);
+        if (!IsOutOfSync()) return;
 
-        if (strategy == null)
-            return;
+        var strategy = _strategies.FirstOrDefault(s => s.SyncStatus == _syncStatus);
+        if (strategy == null) return;
 
         var updatedStatus = await strategy.RunAsync(cancellationToken);
-
         SetSyncStatus(updatedStatus);
     }
 }
