@@ -15,28 +15,18 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
         public async Task ExecuteAsync(IApiClient apiClient, CancellationToken cancellationToken)
         {
-            FileStream? fileStream = await WaitForFileAccessAsync($"{FullPath}", maxRetries: 5, delayMs: 500, cancellationToken)
-                ?? throw new Exception(Constants.ERROR_FILE_LOCKED);
-
-            if (string.Equals(Name, "a.txt")) throw new Exception("TEST");
-
-            using (fileStream)
-            using (var streamContent = new StreamContent(fileStream))
-            using (var content = new MultipartFormDataContent())
+            try
             {
-                try
-                {
-                    content.Add(streamContent, "file", $"{Name}");
-                    await apiClient.AddFileAsync(content, cancellationToken);
-                }
-                catch (HttpRequestException ex)
-                {
-                    throw new Exception(Constants.ERROR_SERVER_UPLOAD, ex);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(Constants.ERROR_UNEXPECTED, ex);
-                }
+                using FileStream? fileStream = await WaitForFileAccessAsync($"{FullPath}", maxRetries: 5, delayMs: 500, cancellationToken) ?? throw new Exception(Constants.ERROR_FILE_LOCKED);
+                using var streamContent = new StreamContent(fileStream);
+                using var content = new MultipartFormDataContent();
+                content.Add(streamContent, "file", $"{Name}");
+
+                await apiClient.AddFileAsync(content, cancellationToken);
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 

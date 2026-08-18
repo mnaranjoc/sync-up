@@ -1,6 +1,5 @@
 ﻿using SyncUp.Agent.Infrastructure.Api;
 using SyncUp.Shared.Models;
-using SyncUp.Shared.Util;
 using System.Text;
 using System.Text.Json;
 
@@ -32,13 +31,9 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 
                 await apiClient.RenameFileAsync($"{OldName}", content, cancellationToken);
             }
-            catch (HttpRequestException ex)
+            catch (Exception)
             {
-                throw new Exception(Constants.ERROR_SERVER_RENAME, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(Constants.ERROR_UNEXPECTED, ex);
+                throw;
             }
         }
     }

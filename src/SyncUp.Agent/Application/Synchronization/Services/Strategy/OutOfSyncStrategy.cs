@@ -44,6 +44,7 @@ public class OutOfSyncStrategy : ISynchronizationStrategy
     private static void SetFailedItem(List<IFileEvent> failedEvents, IFileEvent fileEvent)
     {
         var delay = fileEvent.Delay == 0 ? 1000 : fileEvent.Delay * 2;
+        delay = Math.Min(delay, 5000);
         fileEvent.Delay = delay;
 
         failedEvents.Add(fileEvent);

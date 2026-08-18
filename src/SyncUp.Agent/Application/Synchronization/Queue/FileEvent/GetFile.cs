@@ -25,13 +25,9 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
                     await File.WriteAllTextAsync(path, string.Empty, cancellationToken);
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception)
             {
-                throw new Exception(Constants.ERROR_SERVER_GET, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(Constants.ERROR_UNEXPECTED, ex);
+                throw;
             }
         }
     }

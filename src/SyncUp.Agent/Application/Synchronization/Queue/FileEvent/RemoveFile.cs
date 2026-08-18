@@ -1,5 +1,4 @@
 ﻿using SyncUp.Agent.Infrastructure.Api;
-using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 {
@@ -19,13 +18,9 @@ namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
             {
                 return apiClient.RemoveFileAsync($"{Name}", cancellationToken);
             }
-            catch (HttpRequestException ex)
+            catch (Exception)
             {
-                throw new Exception(Constants.ERROR_SERVER_REMOVE, ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(Constants.ERROR_UNEXPECTED, ex);
+                throw;
             }
         }
     }
