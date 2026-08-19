@@ -7,35 +7,26 @@ public class WatcherTask : BackgroundService
 {
     private readonly IFileWatcherService _fileWatcherService;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<WatcherTask> _logger;
+    private readonly ILogger _logger;
+    private readonly string watchDirectory;
 
-    public WatcherTask(IFileWatcherService fileWatcherService, IConfiguration configuration, ILogger<WatcherTask> logger)
+    public WatcherTask(IFileWatcherService fileWatcherService, IConfiguration configuration, ILogger logger)
     {
-        _fileWatcherService = fileWatcherService;
-        _configuration = configuration;
-        _logger = logger;
+        _fileWatcherService = fileWatcherService ?? throw new ArgumentNullException(nameof(fileWatcherService));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        watchDirectory = _configuration?["WatchDirectory"] ?? throw new ArgumentNullException(nameof(watchDirectory));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("{WorkerName} started.", nameof(WatcherTask));
-
-        string? watchDirectory = _configuration["WatchDirectory"];
-        if (string.IsNullOrWhiteSpace(watchDirectory))
-        {
-            _logger.LogCritical("Configuration Error: 'PathToWatch' is missing from appsettings.json.");
-            return;
-        }
-
         try
         {
             _fileWatcherService.Start(watchDirectory);
 
+            _logger.LogInformation("{WorkerName} started.", nameof(WatcherTask));
+
             await Task.Delay(Timeout.Infinite, stoppingToken);
-        }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation("{WorkerName} stopped.", nameof(WatcherTask));
         }
         catch (Exception ex)
         {
@@ -44,6 +35,8 @@ public class WatcherTask : BackgroundService
         finally
         {
             _fileWatcherService.Stop();
+
+            _logger.LogInformation("{WorkerName} stopped.", nameof(WatcherTask));
         }
     }
 }
