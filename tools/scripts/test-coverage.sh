@@ -22,9 +22,14 @@ for PROJECT_NAME in "${PROJECTS[@]}"; do
   # Generate HTML coverage report
   reportgenerator -reports:"TestResults/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
 
-  # Open the coverage report in the default browser (macOS)
+  # Open the coverage report in the default browser
   if [ -f "coveragereport/index.html" ]; then
-    open "coveragereport/index.html"
+    URL="coveragereport/index.html"
+    
+    # Try Windows (Git Bash), then macOS, then Linux
+    start "$URL" 2>/dev/null \
+      || open "$URL" 2>/dev/null \
+      || xdg-open "$URL" 2>/dev/null
   fi
 
   # Return to tools/scripts folder
