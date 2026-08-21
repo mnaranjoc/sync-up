@@ -7,10 +7,10 @@ public class WatcherTask : BackgroundService
 {
     private readonly IFileWatcherService _fileWatcherService;
     private readonly IConfiguration _configuration;
-    private readonly ILogger _logger;
+    private readonly ILogger<WatcherTask> _logger;
     private readonly string watchDirectory;
 
-    public WatcherTask(IFileWatcherService fileWatcherService, IConfiguration configuration, ILogger logger)
+    public WatcherTask(IFileWatcherService fileWatcherService, IConfiguration configuration, ILogger<WatcherTask> logger)
     {
         _fileWatcherService = fileWatcherService ?? throw new ArgumentNullException(nameof(fileWatcherService));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));

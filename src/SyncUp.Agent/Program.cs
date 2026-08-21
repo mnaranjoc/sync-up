@@ -3,6 +3,7 @@ using SyncUp.Agent.Application.Synchronization.Queue;
 using SyncUp.Agent.Application.Synchronization.Services;
 using SyncUp.Agent.Application.Synchronization.Services.Strategy;
 using SyncUp.Agent.Application.SyncUp;
+using SyncUp.Agent.Application.Watcher.Abstractions;
 using SyncUp.Agent.Application.Watcher.Services;
 using SyncUp.Agent.Infrastructure.Api;
 
@@ -27,6 +28,7 @@ public class Program
         // Watcher
         builder.Services.AddHostedService<WatcherTask>();
         builder.Services.AddSingleton<IFileWatcherService, FileWatcherService>();
+        builder.Services.AddTransient<IFileSystemWatcherWrapper, FileSystemWatcherWrapper>();
 
         // Api client
         builder.Services.AddSingleton<IApiClient, ApiClient>();

@@ -2,7 +2,7 @@
 
 namespace SyncUp.Agent.Application.Synchronization.Queue.FileEvent
 {
-    internal class RemoveFile : IFileEvent
+    public class RemoveFile : IFileEvent
     {
         public string? Name { get; set; } = "";
 

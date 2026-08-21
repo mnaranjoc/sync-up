@@ -10,7 +10,7 @@ namespace SyncUp.Agent.Tests.Application.Watcher
     {
         private readonly Mock<IFileWatcherService> _fileWatcherServiceMock;
         private readonly IConfiguration _configuration;
-        private readonly Mock<ILogger> _loggerMock;
+        private readonly Mock<ILogger<WatcherTask>> _loggerMock;
         private readonly WatcherTask _task;
 
         public WatcherTaskTests()
@@ -19,7 +19,7 @@ namespace SyncUp.Agent.Tests.Application.Watcher
 
             _fileWatcherServiceMock = new Mock<IFileWatcherService>();
             _configuration = new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
-            _loggerMock = new Mock<ILogger>();
+            _loggerMock = new Mock<ILogger<WatcherTask>>();
             _task = new WatcherTask(_fileWatcherServiceMock.Object, _configuration, _loggerMock.Object);
         }
 

@@ -1,44 +1,47 @@
-using System.Net;
 using SyncUp.Agent.Application.Synchronization.Queue.FileEvent;
 using SyncUp.Agent.Application.Synchronization.Services;
+using SyncUp.Agent.Application.Watcher.Abstractions;
 using SyncUp.Shared.Util;
 
 namespace SyncUp.Agent.Application.Watcher.Services;
 
 public class FileWatcherService : IFileWatcherService, IDisposable
 {
-    private FileSystemWatcher? _watcher;
     private readonly ISynchronizationService _service;
+    private readonly IFileSystemWatcherWrapper _watcher;
     private readonly ILogger<FileWatcherService> _logger;
     private readonly object _lock = new();
+    private bool _isActive;
     private bool _disposed;
 
-    public FileWatcherService(ISynchronizationService service, ILogger<FileWatcherService> logger)
+    public FileWatcherService(ISynchronizationService service, IFileSystemWatcherWrapper watcher, ILogger<FileWatcherService> logger)
     {
+        _watcher = watcher;
         _service = service;
         _logger = logger;
     }
 
+    public bool IsActive() => _isActive;
+
     public void Start(string path)
     {
-        path = Files.FixFilePath(path);
-
         lock (_lock)
         {
-            if (_watcher != null) return;
+            if (IsActive()) return;
 
-            if (string.IsNullOrEmpty(path)) throw new Exception(Constants.PATH_NOT_PROVIDED);
+            var fixedPath = Files.FixFilePath(path);
 
-            if (!Directory.Exists(path)) throw new Exception(Constants.FOLDER_DOESNT_EXIST);
+            if (string.IsNullOrEmpty(fixedPath))
+                throw new Exception(Constants.PATH_NOT_PROVIDED);
 
-            _watcher = new FileSystemWatcher(path)
-            {
-                Filter = Constants.FILTER_ALL_FILES,
-                IncludeSubdirectories = true,
-                InternalBufferSize = 65536,
-                NotifyFilter = NotifyFilters.DirectoryName
-                             | NotifyFilters.FileName
-            };
+            if (!Directory.Exists(fixedPath))
+                throw new Exception(Constants.FOLDER_DOESNT_EXIST);
+
+            _watcher.Path = fixedPath;
+            _watcher.Filter = Constants.FILTER_ALL_FILES;
+            _watcher.IncludeSubdirectories = true;
+            _watcher.InternalBufferSize = 65536;
+            _watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName;
 
             _watcher.Created += OnCreated;
             _watcher.Deleted += OnDeleted;
@@ -46,6 +49,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
             _watcher.Error += OnError;
 
             _watcher.EnableRaisingEvents = true;
+            _isActive = true;
         }
     }
 
@@ -53,7 +57,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
     {
         lock (_lock)
         {
-            if (_watcher == null) return;
+            if (!_isActive) return;
 
             _watcher.EnableRaisingEvents = false;
 
@@ -62,9 +66,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
             _watcher.Renamed -= OnRenamed;
             _watcher.Error -= OnError;
 
-            _watcher.Dispose();
-
-            _watcher = null;
+            _isActive = false;
         }
     }
 
@@ -109,6 +111,7 @@ public class FileWatcherService : IFileWatcherService, IDisposable
         if (disposing)
         {
             Stop();
+            _watcher.Dispose();
         }
 
         _disposed = true;
